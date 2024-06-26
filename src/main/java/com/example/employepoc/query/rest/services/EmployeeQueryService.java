@@ -21,7 +21,7 @@ public class EmployeeQueryService {
     public List<Employee> getAllEmployees() {
         return employeeQueryRepository.findAll();
     }
-    public Employee getEmployeeById(Long id) {
+    public Employee getEmployeeById(String id) {
         Optional<Employee> optionalEmployee = employeeQueryRepository.findById(id);
         return optionalEmployee.orElse(null);
     }

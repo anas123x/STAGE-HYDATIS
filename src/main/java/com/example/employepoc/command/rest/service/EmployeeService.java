@@ -22,7 +22,7 @@ public class EmployeeService {
     public Employee saveEmployee(Employee employee) {
         return employeeRepository.save(employee);
     }
-    public Employee updateEmployee(Long id, Employee employeeDetails) {
+    public Employee updateEmployee(String id, Employee employeeDetails) {
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
 
         if(optionalEmployee.isPresent()) {
@@ -34,7 +34,7 @@ public class EmployeeService {
             return null;
         }
     }
-    public void deleteEmployee(Long id) {
+    public void deleteEmployee(String id) {
         employeeRepository.deleteById(id);
     }
 }

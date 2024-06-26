@@ -1,11 +1,14 @@
 package com.example.employepoc.query.rest.controllers;
 
-import com.example.employepoc.command.events.EmployeeEvents;
+import com.example.employepoc.query.queries.FindAllEmployeesQuery;
+import com.example.employepoc.query.queries.FindEmployeeByIdQuery;
 import com.example.employepoc.query.rest.dto.Employee;
-import com.example.employepoc.query.rest.repository.EmployeeQueryRepository;
-import com.example.employepoc.query.rest.services.EmployeeQueryService;
+import com.example.employepoc.query.rest.response.FindAllEmpoyeesResponse;
+import com.example.employepoc.query.rest.response.FindEmployeeByIdResponse;
+import com.hydatis.cqrsref.infrastructure.IQueryDispatcher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,16 +17,28 @@ import java.util.List;
 @RequestMapping("/api/employees")
 public class EmployeeQueryController {
 
-    private final EmployeeQueryService employeeQueryService;
-    private final EmployeeQueryRepository employeeQueryRepository;
-
-    @Autowired
-    public EmployeeQueryController(EmployeeQueryService employeeQueryService, EmployeeQueryRepository employeeQueryRepository) {
-        this.employeeQueryService = employeeQueryService;
-        this.employeeQueryRepository = employeeQueryRepository;
+@Autowired
+    private IQueryDispatcher queryDispatcher;
+ @GetMapping
+    public ResponseEntity<FindAllEmpoyeesResponse> getAllEmployees() {
+        List<Employee> employees = queryDispatcher.send(new FindAllEmployeesQuery());
+        var response = FindAllEmpoyeesResponse.builder()
+                .employees(employees)
+                .message("Employees retrieved successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @KafkaListener(topics = "employee-events", groupId = "employee-consumer")
+   /* @GetMapping("/{id}")
+    public ResponseEntity<FindEmployeeByIdResponse> getEmployeeById(@PathVariable Long id) {
+        Employee employee = queryDispatcher.send(new FindEmployeeByIdQuery(id));
+        var response = FindEmployeeByIdResponse.builder()
+                .employee(employee)
+                .message("Employee retrieved successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }*/
+/*    @KafkaListener(topics = "employee-events", groupId = "employee-consumer")
     public void consumeEmployeeEvents(EmployeeEvents employeeEvent) {
         System.out.println("Consumed type event: " + employeeEvent.getType());
 
@@ -71,5 +86,5 @@ public class EmployeeQueryController {
     @GetMapping("/{id}")
     public Employee getEmployeeById(@PathVariable Long id) {
         return employeeQueryService.getEmployeeById(id);
-    }
+    }*/
 }

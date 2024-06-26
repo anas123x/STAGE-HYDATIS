@@ -1,8 +1,10 @@
 package com.example.employepoc.command.rest.dto;
 
+import com.hydatis.cqrsref.domain.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
@@ -11,10 +13,12 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @Table(name = "employee")
-public class Employee {
+@Builder
+public class Employee extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private String name;
     private String position;
+    private boolean deleted=false;
 }
