@@ -1,12 +1,11 @@
 package com.example.employepoc;
 
-import com.example.employepoc.command.commands.CreateEmployeeCommand;
-import com.example.employepoc.command.commands.DeleteEmployeeCommand;
-import com.example.employepoc.command.commands.UpdateEmployeeCommand;
+import com.example.employepoc.command.commands.*;
+import com.example.employepoc.command.handlers.CheckingCommandHandlers;
 import com.example.employepoc.command.handlers.EmployeeCommandHandlers;
+import com.example.employepoc.query.handlers.CheckingQueryHandler;
 import com.example.employepoc.query.handlers.EmployeeQueryHandler;
-import com.example.employepoc.query.queries.FindAllEmployeesQuery;
-import com.example.employepoc.query.queries.FindEmployeeByIdQuery;
+import com.example.employepoc.query.queries.*;
 import com.hydatis.cqrsref.infrastructure.CommandDispatcher;
 import com.hydatis.cqrsref.infrastructure.QueryDispatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +33,17 @@ public class EmployePocApplication {
     private final EmployeeCommandHandlers employeeCommandHandlers;
     private final CommandDispatcher commandDispatcher;
     private final QueryDispatcher queryDispatcher;
+    private final CheckingCommandHandlers checkingCommandHandlers;
 
+    private final CheckingQueryHandler checkingQueryHandler;
     @Autowired
-    public EmployePocApplication(EmployeeQueryHandler employeeQueryHandler, EmployeeCommandHandlers employeeCommandHandlers, CommandDispatcher commandDispatcher, QueryDispatcher queryDispatcher) {
+    public EmployePocApplication(CheckingQueryHandler checkingQueryHandler,CheckingCommandHandlers checkingCommandHandlers,EmployeeQueryHandler employeeQueryHandler, EmployeeCommandHandlers employeeCommandHandlers, CommandDispatcher commandDispatcher, QueryDispatcher queryDispatcher) {
         this.employeeQueryHandler = employeeQueryHandler;
         this.employeeCommandHandlers = employeeCommandHandlers;
         this.commandDispatcher = commandDispatcher;
         this.queryDispatcher = queryDispatcher;
+        this.checkingCommandHandlers = checkingCommandHandlers;
+        this.checkingQueryHandler = checkingQueryHandler;
     }
 
     @PostConstruct
@@ -48,10 +51,24 @@ public class EmployePocApplication {
         commandDispatcher.registerHandler(CreateEmployeeCommand.class, employeeCommandHandlers::handle);
         commandDispatcher.registerHandler(UpdateEmployeeCommand.class, employeeCommandHandlers::handle);
         commandDispatcher.registerHandler(DeleteEmployeeCommand.class, employeeCommandHandlers::handle);
+        commandDispatcher.registerHandler(CreateCheckingCommand.class,checkingCommandHandlers::handle);
+        commandDispatcher.registerHandler(CreateOrUpdatePersonCheckingCommand.class,checkingCommandHandlers::handle);
+        commandDispatcher.registerHandler(DeletePersonCheckingCommand.class,checkingCommandHandlers::handle);
+        commandDispatcher.registerHandler(CreatePersonsCheckingWithCollectiveCommand.class,checkingCommandHandlers::handle);
+        commandDispatcher.registerHandler(CreatePersonsCheckingCommand.class,checkingCommandHandlers::handle);
 
 
         queryDispatcher.registerHandler(FindAllEmployeesQuery.class, employeeQueryHandler::handle);
         queryDispatcher.registerHandler(FindEmployeeByIdQuery.class, employeeQueryHandler::handle);
+
+        queryDispatcher.registerHandler(GetCollectiveCheckingsQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetDayCheckingsQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetPersonCheckingsQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetPersonsCheckingsQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetUserCheckingsByDatesAndPersonsMapQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetUserCheckingsByPersonsAndDatesMapQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetUserCheckingsQuery.class, checkingQueryHandler::handle);
+
 
     }
 

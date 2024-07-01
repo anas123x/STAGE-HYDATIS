@@ -49,6 +49,7 @@ public class EmployeeCommandHandlers implements EmployeeCommandHandlersInterface
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         employeeToUpdate.setName(updateEmployeeCommand.getEmployee().getName());
         employeeToUpdate.setPosition(updateEmployeeCommand.getEmployee().getPosition());
+        employeeToUpdate.setDeleted(updateEmployeeCommand.getEmployee().isDeleted());
         employeeRepository.save(employeeToUpdate);
         EmployeeAggregate employeeAggregate = new EmployeeAggregate(updateEmployeeCommand);
         eventSourceHandler.save(employeeAggregate);

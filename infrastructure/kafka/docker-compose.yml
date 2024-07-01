@@ -1,34 +1,30 @@
-version: '3.8'
-services:
+version: '3.7'
 
-  zookeeper_parkey:
-    container_name: zookeeper-parkey
-    image: confluentinc/cp-zookeeper:latest
-    ports:
-      - "2182:2181"
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-
-  kafka_parkey:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper_parkey
-    container_name: "kafka-parkey"
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - "9094:9092"
-    expose:
-      - "9094"
+      - "2181:2181"
+
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka_parkey:9094,OUTSIDE://kafka:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9094,OUTSIDE://0.0.0.0:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper_parkey:2181
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9094,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9094,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CREATE_TOPICS: "topic_test:1:1"
       KAFKA_MESSAGE_MAX_BYTES: 20971520
       KAFKA_MAX_MESSAGE_BYTES: 20971520
       KAFKA_PRODUCER_MAX_REQUEST_SIZE: 20971520
       KAFKA_CONSUMER_MAX_PARTITION_FETCH_BYTES: 20971520
-
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock

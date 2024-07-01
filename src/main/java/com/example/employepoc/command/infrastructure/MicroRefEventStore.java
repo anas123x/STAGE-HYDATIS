@@ -55,6 +55,7 @@ public class MicroRefEventStore implements EventStore {
             var persistedEvent = eventStoreRepository.save(eventModel);
             if (persistedEvent.getId() != null) {
                 eventProducer.produce(event.getClass().getSimpleName(), event);
+                System.out.println("Event produced: " + event.getClass().getSimpleName()+event.toString());
             }
         }
     }
