@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controller for handling queries related to checkings.
+ * This controller provides endpoints for retrieving checkings for a single person or multiple persons
+ * within a specified date range.
+ */
 @RestController
 @RequestMapping("/api/checkings")
 public class CheckingQueryController {
@@ -27,6 +32,15 @@ public class CheckingQueryController {
     @Autowired
     private IQueryDispatcher queryDispatcher;
     private static final org.joda.time.format.DateTimeFormatter formatter = org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+    /**
+     * Retrieves checkings for a single person within a specified date range.
+     *
+     * @param personId The ID of the person whose checkings are to be retrieved.
+     * @param from The start date of the range (inclusive).
+     * @param to The end date of the range (inclusive).
+     * @return ResponseEntity containing the checkings and a success message.
+     */
     @GetMapping("/person/{personId}")
     public ResponseEntity<GetPersonCheckingsResponse> getPersonCheckings(
             @PathVariable Long personId,
@@ -46,7 +60,14 @@ public class CheckingQueryController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    /**
+     * Retrieves checkings for multiple persons within a specified date range.
+     *
+     * @param personsId A comma-separated string of person IDs whose checkings are to be retrieved.
+     * @param from The start date of the range (inclusive).
+     * @param to The end date of the range (inclusive).
+     * @return ResponseEntity containing the checkings mapped by person ID and a success message.
+     */
     @GetMapping("/persons")
     public ResponseEntity<GetPersonsCheckingsResponse> getPersonsCheckings(
             @RequestParam("personsId") String personsId,
@@ -69,6 +90,4 @@ public class CheckingQueryController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
 }

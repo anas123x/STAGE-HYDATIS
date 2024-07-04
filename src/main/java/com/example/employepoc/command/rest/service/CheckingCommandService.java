@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Service class for handling checking-related commands.
+ */
 @Service
 public class CheckingCommandService implements ICheckingCommandService{
 
@@ -20,6 +23,16 @@ public class CheckingCommandService implements ICheckingCommandService{
     @Autowired
     private PersonCommandRepository personCommandRepository;
 
+    /**
+     * Creates a new checking record in the database.
+     *
+     * @param localDateTime The actual time of the checking.
+     * @param personId The ID of the person associated with the checking.
+     * @param cd The direction of the checking (IN/OUT).
+     * @param s The source of the checking.
+     * @param others Additional checkings related to the current operation.
+     * @return The created Checking object, or null if the person is not found.
+     */
     @Override
     public Checking createChecking(LocalDateTime localDateTime, Long personId, Checking.CheckingDirection cd, Checking.CheckingSource s, ArrayList<Checking> others) {
         System.out.println("personID" + personId + "localDateTime" + localDateTime + "Checking" + cd + "sourec " + s + "other" + others);
@@ -46,6 +59,12 @@ public class CheckingCommandService implements ICheckingCommandService{
         return checkingCommandRepository.save(checking);
     }
 
+    /**
+     * Deletes a person's checking record, handling duplicates if specified.
+     *
+     * @param checking The checking record to delete.
+     * @param duplicate Whether to handle duplicate records.
+     */
     public void deletePersonChecking(Checking checking, boolean duplicate) {
         System.out.println("Checking: " + checking + " Duplicate: " + duplicate);
         if (duplicate) {
@@ -74,35 +93,79 @@ public class CheckingCommandService implements ICheckingCommandService{
             checkingCommandRepository.save(checking);
         }
     }
+
+    /**
+     * Creates or updates a person's checking record based on the provided ID.
+     *
+     * @param id The ID of the checking to create or update.
+     * @param personId The ID of the person associated with the checking.
+     * @param date The logical date of the checking.
+     * @param threeDaysTime Additional time information (not used in current implementation).
+     * @return The updated or newly created Checking object, or null if not found.
+     */
     @Override
     public Checking createOrUpdatePersonChecking(String id, Long personId, LocalDate date, String threeDaysTime) {
-        // Implement the logic to create or update a Person's Checking here
         // Fetch the Checking from the database
         Checking checking = checkingCommandRepository.findById(id).orElse(null);
         if (checking == null) {
-            // Handle the case where the Checking is not found
-            return null;
+            // If the Checking does not exist, create a new one
+            checking = new Checking();
+            checking.setId(UUID.randomUUID().toString()); // Generate a new ID
+            checking.setActualTime(date.toDateTimeAtStartOfDay().toLocalDateTime()); // Set the actual time based on the logical date
+            // Fetch the person associated with the ID
+            Person person = personCommandRepository.findById(personId).orElse(null);
+            if (person == null) {
+                System.out.println("Person not found");
+                return null; // Return null if the person is not found
+            }
+            checking.setPerson(person); // Set the person for the checking
+        } else {
+            // If the Checking exists, update its logical time
+            checking.setLogicalTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
         }
-
-        // Update the Checking
-        checking.setLogicalTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
-        // Add any other necessary fields
+        // Set other necessary fields for the checking
+        checking.setUsed(false); // Example of setting a default value
+        checking.setIgnoredByCalc(false); // Example of setting a default value
 
         // Save the Checking to the database
         return checkingCommandRepository.save(checking);
     }
 
+    /**
+     * Creates checkings for multiple persons on a given date.
+     *
+     * @param personIds The IDs of the persons for whom to create checkings.
+     * @param date The date for the checkings.
+     * @param threeDaysTime Additional time information (not used in current implementation).
+     * @return A list of created Checking objects.
+     */
     @Override
     public List<Checking> createPersonsChecking(List<Long> personIds, LocalDate date, String threeDaysTime) {
-        // Implement the logic to create Checkings for multiple Persons here
-        // This will depend on your specific business logic
-        return null;
+        List<Checking> createdCheckings = new ArrayList<>();
+        for (Long personId : personIds) {
+            // For each person ID, create a new checking
+            Checking newChecking = new Checking();
+            newChecking.setId(UUID.randomUUID().toString()); // Generate a new ID
+            newChecking.setActualTime(date.toDateTimeAtStartOfDay().toLocalDateTime()); // Set the actual time based on the date
+            Person person = personCommandRepository.findById(personId).orElse(null);
+            if (person != null) {
+                newChecking.setPerson(person); // Set the person for the checking
+                createdCheckings.add(checkingCommandRepository.save(newChecking)); // Save the checking and add it to the list
+            }
+        }
+        return createdCheckings; // Return the list of created checkings
     }
-
+    /**
+     * Creates checkings for multiple persons, with an option for collective processing.
+     *
+     * @param personIds A list of person IDs.
+     * @param date The date of the checkings.
+     * @param threeDaysTime A string representation of a time span related to the checkings.
+     * @param collective A flag indicating if the checkings should be processed as a collective action.
+     * @return A list of created Checking instances.
+     */
     @Override
     public List<Checking> createPersonsChecking(List<Long> personIds, LocalDate date, String threeDaysTime, boolean collective) {
-        // Implement the logic to create Checkings for multiple Persons here, considering the 'collective' parameter
-        // This will depend on your specific business logic
         return null;
     }
 }

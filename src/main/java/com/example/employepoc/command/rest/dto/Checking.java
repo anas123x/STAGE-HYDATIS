@@ -8,6 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ * Represents a checking event, encapsulating all relevant data such as times, person involved, and source of the checking.
+ * This class is annotated for persistence in a relational database and includes additional metadata for MongoDB storage.
+ */
 @Data
 @NoArgsConstructor
 @Entity

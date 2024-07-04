@@ -14,6 +14,12 @@ import org.joda.time.LocalDate;
 @NoArgsConstructor
 @SuperBuilder
 @JsonSerialize
+
+/**
+ * Event representing the deletion of a person's checking record.
+ * This event is triggered when a checking record associated with a person is deleted,
+ * capturing the unique identifier of the event, the checking details, and a flag indicating if it's a duplicate action.
+ */
 public class PersonCheckingCreatedOrUpdatedEvent extends BaseEvent {
     private String identifier;
 

@@ -9,9 +9,11 @@ import java.util.*;
 
 //import tn.waycon.alquasar2.gp.association.model.PersonAffectedHard;
 
+
 /**
- * @author bacem
- * @author djo
+ * Represents a person entity with various personal and professional details.
+ * This class includes information such as name, gender, contact details, and employment information.
+ * It also supports custom attributes for additional flexibility.
  */
 @Data
 @Entity

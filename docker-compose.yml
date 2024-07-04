@@ -1,41 +1,41 @@
 version: '3'
 services:
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:latest # The Docker image for Kafka
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # Connection string for Zookeeper
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # Kafka's advertised listeners
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Replication factor for the offsets topic
     depends_on:
-      - zookeeper
+      - zookeeper # Depends on the Zookeeper service
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:latest # The Docker image for Zookeeper
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: 2181 # Client port for Zookeeper
 
   postgres:
-    image: postgres:latest
+    image: postgres:latest # The Docker image for PostgreSQL
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres # Default user for PostgreSQL
+      POSTGRES_PASSWORD: admin # Password for the default user
+      POSTGRES_DB: postgres # Default database name
+      POSTGRES_HOST_AUTH_METHOD: trust # Authentication method for the host
     ports:
-      - "5432:5432"
+      - "5432:5432" # Expose PostgreSQL on port 5432
 
   mongo:
-    image: mongo:latest
+    image: mongo:latest # The Docker image for MongoDB
     ports:
-      - "27017:27017"
+      - "27017:27017" # Expose MongoDB on port 27017
 
   app:
     build:
-      context: ./
-      dockerfile: dockerfile
+      context: ./ # Context for building the application's Docker image
+      dockerfile: dockerfile # Name of the Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:8080" # Expose the application on port 8080
     depends_on:
       - kafka
       - postgres
-      - mongo
+      - mongo # The application depends on Kafka, PostgreSQL, and MongoDB services
