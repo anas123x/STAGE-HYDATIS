@@ -1,5 +1,8 @@
 package com.example.employepoc.command.rest.service;
 
+import com.example.employepoc.command.exceptions.CheckingCreatedException;
+import com.example.employepoc.command.exceptions.CheckingDeletedException;
+import com.example.employepoc.command.exceptions.PersonNotFoundException;
 import com.example.employepoc.command.rest.dto.Checking;
 import com.example.employepoc.command.rest.dto.Person;
 import com.example.employepoc.command.rest.repository.CheckingCommandRepository;
@@ -35,28 +38,37 @@ public class CheckingCommandService implements ICheckingCommandService{
      */
     @Override
     public Checking createChecking(LocalDateTime localDateTime, Long personId, Checking.CheckingDirection cd, Checking.CheckingSource s, ArrayList<Checking> others) {
-        System.out.println("personID" + personId + "localDateTime" + localDateTime + "Checking" + cd + "sourec " + s + "other" + others);
-        // Fetch the person from the database
-        Person person = personCommandRepository.findById(personId).orElse(null);
-        if (person == null) {
-            System.out.println("person is null");
-            return null;
+        try{
+            System.out.println("personID" + personId + "localDateTime" + localDateTime + "Checking" + cd + "sourec " + s + "other" + others);
+            // Fetch the person from the database
+            Person person = personCommandRepository.findById(personId)
+                    .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
+            ;
+            if (person == null) {
+                System.out.println("person is null");
+                return null;
+            }
+            Checking checking = new Checking();
+            checking.setId(UUID.randomUUID().toString());
+            checking.setActualTime(localDateTime);
+            checking.setPerson(person);
+            checking.setDirection(cd);
+            checking.setActualSource(s);
+            checking.setLogicalTime(localDateTime);
+            checking.setMatricule(person.getMatricule());
+            checking.setDirectionGenerated(true);
+            checking.setIgnoredByCalc(false);
+            checking.setUserSetTime(localDateTime);
+            checking.setTimesheetId(1001L);
+            checking.setUsed(false);
+            System.out.println("Checking: " + checking.toString());
+            return checkingCommandRepository.save(checking);
+        }catch (PersonNotFoundException e){
+            throw new PersonNotFoundException("Error creating checking: " + e.getMessage());
         }
-        Checking checking = new Checking();
-        checking.setId(UUID.randomUUID().toString());
-        checking.setActualTime(localDateTime);
-        checking.setPerson(person);
-        checking.setDirection(cd);
-        checking.setActualSource(s);
-        checking.setLogicalTime(localDateTime);
-        checking.setMatricule(person.getMatricule());
-        checking.setDirectionGenerated(true);
-        checking.setIgnoredByCalc(false);
-        checking.setUserSetTime(localDateTime);
-        checking.setTimesheetId(1001L);
-        checking.setUsed(false);
-        System.out.println("Checking: " + checking.toString());
-        return checkingCommandRepository.save(checking);
+        catch (Exception e){
+            throw new CheckingCreatedException("Error creating checking: " + e.getMessage());
+        }
     }
 
     /**
@@ -66,32 +78,42 @@ public class CheckingCommandService implements ICheckingCommandService{
      * @param duplicate Whether to handle duplicate records.
      */
     public void deletePersonChecking(Checking checking, boolean duplicate) {
-        System.out.println("Checking: " + checking + " Duplicate: " + duplicate);
-        if (duplicate) {
-            List<Checking> checkings = checkingCommandRepository.findByPersonIdAndActualTimeAndDirectionAndActualSource(
-                    checking.getPerson().getId(),
-                    checking.getActualTime(),
-                    checking.getDirection(),
-                    checking.getActualSource()
-            );
+      try  {
+            personCommandRepository.findById(checking.getPerson().getId())
+                    .orElseThrow(() -> new PersonNotFoundException("Person with ID " + checking.getPerson().getId() + " not found."));
 
-            if (checkings.size() > 1) {
+                List<Checking> checkings = checkingCommandRepository.findByPersonIdAndActualTimeAndDirectionAndActualSource(
+                        checking.getPerson().getId(),
+                        checking.getActualTime(),
+                        checking.getDirection(),
+                        checking.getActualSource()
+                );
+                if (checkings.isEmpty()){
+                    throw new CheckingDeletedException("no checkings not found");
+                }
+                if (checkings.size() > 1 && duplicate) {
 
-                checkings.stream().map(
-                        c -> {
-                            c.setDeleted(true);
-                            return c;
-                        }
-                ).forEach(checkingCommandRepository::save);
+                    checkings.stream().map(
+                            c -> {
+                                c.setDeleted(true);
+                                return c;
+                            }
+                    ).forEach(checkingCommandRepository::save);
 
-            } else {
-                checkings.get(0).setDeleted(true);
-                checkingCommandRepository.save(checkings.get(0));
-            }
-        } else {
-            checking.setDeleted(true);
-            checkingCommandRepository.save(checking);
+                } else {
+                    checkings.get(0).setDeleted(true);
+                    checkingCommandRepository.save(checkings.get(0));
+                }
+
         }
+      catch (PersonNotFoundException e){
+          throw new PersonNotFoundException("Error deleting checking: " + e.getMessage());
+      }
+      catch (
+                Exception e){
+            throw new CheckingDeletedException("Error deleting checking: " + e.getMessage());
+        }
+
     }
 
     /**

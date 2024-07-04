@@ -2,6 +2,9 @@ package com.example.employepoc.command.handlers;
 
 import com.example.employepoc.command.commands.*;
 import com.example.employepoc.command.domain.CheckingAggregate;
+import com.example.employepoc.command.exceptions.CheckingCreatedException;
+import com.example.employepoc.command.exceptions.CheckingDeletedException;
+import com.example.employepoc.command.exceptions.PersonNotFoundException;
 import com.example.employepoc.command.rest.dto.Checking;
 import com.example.employepoc.command.rest.service.CheckingCommandService;
 import com.hydatis.cqrsref.handlers.EventSourcingHandler;
@@ -47,9 +50,16 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
         Checking.CheckingSource s = createCheckingCommand.getChecking().getActualSource();
 
         ArrayList<Checking> others = createCheckingCommand.getOthers();
-
-        Checking newChecking = checkingCommandService.createChecking(localDateTime, personId, cd, s, others);
-
+        try {
+            Checking newChecking = checkingCommandService.createChecking(localDateTime, personId, cd, s, others);
+        }
+        catch (PersonNotFoundException e) {
+            log.error("Error creating checking record: " + e.getMessage());
+            throw e;
+        }
+        catch (CheckingCreatedException e){
+            throw e;
+        }
         // Create a new CheckingAggregate from the new Checking
         CheckingAggregate checkingAggregate = new CheckingAggregate(createCheckingCommand);
 
@@ -69,7 +79,17 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
     public void handle(DeletePersonCheckingCommand deletePersonCheckingCommand) {
         Checking checking = deletePersonCheckingCommand.getChecking();
         boolean duplicate = deletePersonCheckingCommand.isDuplicate();
-        checkingCommandService.deletePersonChecking(checking, duplicate);
+        try {
+            checkingCommandService.deletePersonChecking(checking, duplicate);
+        }
+        catch (PersonNotFoundException e) {
+            log.error("Error deleting checking record: " + e.getMessage());
+            throw e;
+        }
+        catch (CheckingDeletedException e)
+        {
+            throw e;
+        }
         CheckingAggregate checkingAggregate = new CheckingAggregate(deletePersonCheckingCommand);
         eventSourceHandler.save(checkingAggregate);
 

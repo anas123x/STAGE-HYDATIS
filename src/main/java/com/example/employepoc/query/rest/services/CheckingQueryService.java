@@ -6,6 +6,7 @@ import com.example.employepoc.query.rest.repository.CheckingQueryRepository;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * Utilizes the {@link CheckingQueryRepository} for data access.
  */
 @Service
+@ComponentScan("com.example.employepoc.query.rest.repository")
 public class CheckingQueryService implements ICheckingQueryService {
     private final CheckingQueryRepository repository;
 

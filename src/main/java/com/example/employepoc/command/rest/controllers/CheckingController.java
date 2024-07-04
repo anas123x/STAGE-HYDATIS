@@ -2,11 +2,16 @@ package com.example.employepoc.command.rest.controllers;
 
 import com.example.employepoc.command.commands.CreateCheckingCommand;
 import com.example.employepoc.command.commands.DeletePersonCheckingCommand;
+import com.example.employepoc.command.exceptions.CheckingCreatedException;
+import com.example.employepoc.command.exceptions.CheckingDeletedException;
+import com.example.employepoc.command.exceptions.PersonNotFoundException;
 import com.example.employepoc.command.rest.dto.Checking;
 import com.example.employepoc.command.rest.requests.CreateCheckingRequest;
 import com.example.employepoc.command.rest.requests.DeletePersonCheckingRequest;
+import com.example.employepoc.command.rest.response.CheckingResponse;
 import com.hydatis.cqrsref.infrastructure.CommandDispatcher;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +39,7 @@ public class CheckingController {
      * @param checkingRequest The request containing the checking details to be saved.
      */
     @PostMapping
-    public void saveChecking(@RequestBody CreateCheckingRequest checkingRequest) {
+    public ResponseEntity<CheckingResponse> saveChecking(@RequestBody CreateCheckingRequest checkingRequest) {
         Checking checking = checkingRequest.getChecking();
         Long personId = checkingRequest.getPersonId();
         ArrayList<Checking> others = checkingRequest.getOthers();
@@ -46,8 +51,24 @@ public class CheckingController {
         createCheckingCommand.setPersonId(personId);
         createCheckingCommand.setChecking(checking);
         createCheckingCommand.setOthers(others);
+        try {
+            commandDispatcher.send(createCheckingCommand);
+        }
+        catch (PersonNotFoundException e){
+            return ResponseEntity.status(404).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        }
+        catch (CheckingCreatedException e){
+            return ResponseEntity.status(500).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        }
 
-        commandDispatcher.send(createCheckingCommand);
+        return ResponseEntity.status(201).body(new CheckingResponse().builder()
+                .checking(checking)
+                .message("Checking saved successfully").
+                build());
     }
 
     /**
@@ -57,12 +78,24 @@ public class CheckingController {
      * @param deletePersonCheckingRequest The request containing the checking details to be deleted.
      */
     @DeleteMapping
-    public void deleteChecking(@RequestBody DeletePersonCheckingRequest deletePersonCheckingRequest) {
+    public ResponseEntity<CheckingResponse>  deleteChecking(@RequestBody DeletePersonCheckingRequest deletePersonCheckingRequest) {
         // Create a new DeletePersonCheckingCommand
 
         DeletePersonCheckingCommand dpchc = new DeletePersonCheckingCommand();
         dpchc.setChecking(deletePersonCheckingRequest.getChecking());
         dpchc.setDuplicate(deletePersonCheckingRequest.isDuplicate());
-        commandDispatcher.send(dpchc);
+        try {
+            commandDispatcher.send(dpchc);
+        }
+
+        catch (PersonNotFoundException | CheckingDeletedException e){
+        return ResponseEntity.status(404).body(new CheckingResponse().builder()
+                .message(e.getMessage())
+                .build());
+    }
+        return ResponseEntity.ok(new CheckingResponse().builder()
+                .checking(deletePersonCheckingRequest.getChecking())
+                .message("Checking deleted successfully").
+                build());
     }
 }
