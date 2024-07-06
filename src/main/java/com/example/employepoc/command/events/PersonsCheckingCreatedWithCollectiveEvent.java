@@ -28,4 +28,5 @@ public class PersonsCheckingCreatedWithCollectiveEvent extends BaseEvent {
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing
     private boolean collective; // Flag indicating if the checking is a collective action
+    private List<Checking> checkings; // List of checking records created
 }

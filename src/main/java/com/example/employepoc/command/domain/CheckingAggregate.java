@@ -50,6 +50,7 @@ public class CheckingAggregate extends AggregateRoot {
                 .id(command.getId())
                 .personId(command.getPersonId())
                 .date(command.getDate())
+                .checkingId(command.getCheckingId())
                 .threeDaysTime(command.getThreeDaysTime())
                 .build());
     }
@@ -79,6 +80,7 @@ public class CheckingAggregate extends AggregateRoot {
                 .personIds(command.getPersonIds())
                 .date(command.getDate())
                 .threeDaysTime(command.getThreeDaysTime())
+                .checkings(command.getCheckings())
                 .build());
     }
 
@@ -92,6 +94,7 @@ public class CheckingAggregate extends AggregateRoot {
                 .date(command.getDate())
                 .threeDaysTime(command.getThreeDaysTime())
                 .collective(command.isCollective())
+                .checkings(command.getCheckings())
                 .build());
     }
 

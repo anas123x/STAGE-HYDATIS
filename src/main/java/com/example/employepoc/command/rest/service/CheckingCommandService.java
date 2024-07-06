@@ -2,6 +2,7 @@ package com.example.employepoc.command.rest.service;
 
 import com.example.employepoc.command.exceptions.CheckingCreatedException;
 import com.example.employepoc.command.exceptions.CheckingDeletedException;
+import com.example.employepoc.command.exceptions.CheckingNotFoundException;
 import com.example.employepoc.command.exceptions.PersonNotFoundException;
 import com.example.employepoc.command.rest.dto.Checking;
 import com.example.employepoc.command.rest.dto.Person;
@@ -125,33 +126,59 @@ public class CheckingCommandService implements ICheckingCommandService{
      * @param threeDaysTime Additional time information (not used in current implementation).
      * @return The updated or newly created Checking object, or null if not found.
      */
-    @Override
-    public Checking createOrUpdatePersonChecking(String id, Long personId, LocalDate date, String threeDaysTime) {
-        // Fetch the Checking from the database
-        Checking checking = checkingCommandRepository.findById(id).orElse(null);
-        if (checking == null) {
-            // If the Checking does not exist, create a new one
-            checking = new Checking();
-            checking.setId(UUID.randomUUID().toString()); // Generate a new ID
-            checking.setActualTime(date.toDateTimeAtStartOfDay().toLocalDateTime()); // Set the actual time based on the logical date
-            // Fetch the person associated with the ID
-            Person person = personCommandRepository.findById(personId).orElse(null);
-            if (person == null) {
-                System.out.println("Person not found");
-                return null; // Return null if the person is not found
-            }
-            checking.setPerson(person); // Set the person for the checking
-        } else {
-            // If the Checking exists, update its logical time
-            checking.setLogicalTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
-        }
-        // Set other necessary fields for the checking
-        checking.setUsed(false); // Example of setting a default value
-        checking.setIgnoredByCalc(false); // Example of setting a default value
 
-        // Save the Checking to the database
-        return checkingCommandRepository.save(checking);
+    @Override
+    public Checking createOrUpdatePersonChecking(String id, Long personId, LocalDateTime date, String threeDaysTime) {
+        try {
+            // Fetch the person from the database
+            Person person = personCommandRepository.findById(personId)
+                    .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
+
+            Checking checking;
+
+            if (id != null) {
+                // Update existing checking if ID is provided
+                checking = checkingCommandRepository.findById(id)
+                        .orElseThrow(() -> new CheckingNotFoundException("Checking with ID " + id + " not found."));
+            } else {
+                // Create new checking instance
+                checking = new Checking();
+                checking.setId(UUID.randomUUID().toString());
+            }
+
+            // Set common properties
+            checking.setActualTime(date);
+            checking.setPerson(person);
+            checking.setDirection(Checking.CheckingDirection.IN); // Example: Set direction as IN
+            checking.setActualSource(Checking.CheckingSource.USER); // Example: Set source as USER
+            checking.setLogicalTime(date);
+            checking.setMatricule(person.getMatricule()); // Example: Set matricule from person
+            checking.setDirectionGenerated(true); // Example: Set direction generated flag
+            checking.setIgnoredByCalc(false); // Example: Set ignored by calculation flag
+            checking.setUserSetTime(date);
+            checking.setTimesheetId(1001L); // Example: Set timesheet ID
+            checking.setUsed(false); // Example: Set used flag
+
+            // Set custom threeDaysTime value
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("threeDaysTime", threeDaysTime);
+            checking.setData(dataMap);
+            // Save checking to database
+            return checkingCommandRepository.save(checking);
+        }
+        catch (PersonNotFoundException e) {
+            throw new PersonNotFoundException("Error creating or updating checkingaa: " + e.getMessage());
+        }
+        catch (CheckingNotFoundException e) {
+            throw new CheckingNotFoundException("Error creating or updating checkingxx: " + e.getMessage());
+        }
+
+        catch (Exception e) {
+            System.out.println(e);
+            throw new CheckingCreatedException("Error creating or updating checkingff: " + e.getMessage());
+        }
     }
+
 
     /**
      * Creates checkings for multiple persons on a given date.
@@ -161,35 +188,75 @@ public class CheckingCommandService implements ICheckingCommandService{
      * @param threeDaysTime Additional time information (not used in current implementation).
      * @return A list of created Checking objects.
      */
+
     @Override
     public List<Checking> createPersonsChecking(List<Long> personIds, LocalDate date, String threeDaysTime) {
-        List<Checking> createdCheckings = new ArrayList<>();
+        List<Checking> checkings = new ArrayList<>();
         for (Long personId : personIds) {
-            // For each person ID, create a new checking
-            Checking newChecking = new Checking();
-            newChecking.setId(UUID.randomUUID().toString()); // Generate a new ID
-            newChecking.setActualTime(date.toDateTimeAtStartOfDay().toLocalDateTime()); // Set the actual time based on the date
-            Person person = personCommandRepository.findById(personId).orElse(null);
-            if (person != null) {
-                newChecking.setPerson(person); // Set the person for the checking
-                createdCheckings.add(checkingCommandRepository.save(newChecking)); // Save the checking and add it to the list
+            try {
+                Person person = personCommandRepository.findById(personId)
+                        .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
+
+                Checking checking = new Checking();
+                checking.setId(UUID.randomUUID().toString());
+                checking.setActualTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setPerson(person);
+                checking.setDirection(Checking.CheckingDirection.IN);
+                checking.setActualSource(Checking.CheckingSource.USER);
+                checking.setLogicalTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setMatricule(person.getMatricule());
+                checking.setDirectionGenerated(true);
+                checking.setIgnoredByCalc(false);
+                checking.setUserSetTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setTimesheetId(1001L);
+                checking.setUsed(false);
+
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("threeDaysTime", threeDaysTime);
+                checking.setData(dataMap);
+
+                checkings.add(checkingCommandRepository.save(checking));
+            } catch (Exception e) {
+                throw new CheckingCreatedException("Error creating checkings for person ID " + personId + ": " + e.getMessage());
             }
-            else
-                System.out.println("Person not found");
         }
-        return createdCheckings; // Return the list of created checkings
+        return checkings;
     }
-    /**
-     * Creates checkings for multiple persons, with an option for collective processing.
-     *
-     * @param personIds A list of person IDs.
-     * @param date The date of the checkings.
-     * @param threeDaysTime A string representation of a time span related to the checkings.
-     * @param collective A flag indicating if the checkings should be processed as a collective action.
-     * @return A list of created Checking instances.
-     */
+
     @Override
     public List<Checking> createPersonsChecking(List<Long> personIds, LocalDate date, String threeDaysTime, boolean collective) {
-        return null;
+        List<Checking> checkings = new ArrayList<>();
+        for (Long personId : personIds) {
+            try {
+                Person person = personCommandRepository.findById(personId)
+                        .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
+
+                Checking checking = new Checking();
+                checking.setId(UUID.randomUUID().toString());
+                checking.setActualTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setPerson(person);
+                checking.setDirection(Checking.CheckingDirection.IN);
+                checking.setActualSource(Checking.CheckingSource.USER);
+                checking.setLogicalTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setMatricule(person.getMatricule());
+                checking.setDirectionGenerated(true);
+                checking.setIgnoredByCalc(false);
+                checking.setUserSetTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setTimesheetId(1001L);
+                checking.setUsed(false);
+
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("threeDaysTime", threeDaysTime);
+                dataMap.put("collective",collective ? "true" : "false");
+                checking.setData(dataMap);
+
+
+
+                checkings.add(checkingCommandRepository.save(checking));
+            } catch (Exception e) {
+                throw new CheckingCreatedException("Error creating checkings for person ID " + personId + ": " + e.getMessage());
+            }
+        }
+        return checkings;
     }
 }

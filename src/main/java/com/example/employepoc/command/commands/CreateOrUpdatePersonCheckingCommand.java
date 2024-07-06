@@ -1,5 +1,6 @@
 package com.example.employepoc.command.commands;
 
+import com.example.employepoc.command.rest.dto.Checking;
 import com.hydatis.cqrsref.commands.BaseCommand;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import org.joda.time.LocalDate;
 public class CreateOrUpdatePersonCheckingCommand extends BaseCommand {
     private String id; // Unique identifier for the command
     private Long personId; // ID of the person associated with the checking
+    private String checkingId;
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing
 }

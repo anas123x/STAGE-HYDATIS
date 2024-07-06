@@ -42,7 +42,7 @@ public interface ICheckingCommandService {
      * @param threeDaysTime A string representation of a time span related to the checking.
      * @return The created or updated Checking instance.
      */
-    Checking createOrUpdatePersonChecking(String id, Long personId, LocalDate date, String threeDaysTime);
+    Checking createOrUpdatePersonChecking(String id, Long personId, LocalDateTime date, String threeDaysTime);
 
     /**
      * Creates checkings for multiple persons.

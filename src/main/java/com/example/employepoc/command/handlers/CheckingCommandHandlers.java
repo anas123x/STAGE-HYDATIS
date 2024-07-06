@@ -9,11 +9,13 @@ import com.example.employepoc.command.rest.dto.Checking;
 import com.example.employepoc.command.rest.service.CheckingCommandService;
 import com.hydatis.cqrsref.handlers.EventSourcingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service layer responsible for handling commands related to checking operations.
@@ -52,6 +54,12 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
         ArrayList<Checking> others = createCheckingCommand.getOthers();
         try {
             Checking newChecking = checkingCommandService.createChecking(localDateTime, personId, cd, s, others);
+            // Create a new CheckingAggregate from the new Checking
+            createCheckingCommand.getChecking().setId(newChecking.getId());
+            CheckingAggregate checkingAggregate = new CheckingAggregate(createCheckingCommand);
+
+            // Save the new CheckingAggregate using the eventSourceHandler
+            eventSourceHandler.save(checkingAggregate);
         }
         catch (PersonNotFoundException e) {
             log.error("Error creating checking record: " + e.getMessage());
@@ -60,15 +68,28 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
         catch (CheckingCreatedException e){
             throw e;
         }
-        // Create a new CheckingAggregate from the new Checking
-        CheckingAggregate checkingAggregate = new CheckingAggregate(createCheckingCommand);
 
-        // Save the new CheckingAggregate using the eventSourceHandler
-        eventSourceHandler.save(checkingAggregate);
     }
 
     @Override
     public void handle(CreateOrUpdatePersonCheckingCommand createOrUpdatePersonCheckingCommand) {
+        // Extract the necessary information from the command object
+        String id = createOrUpdatePersonCheckingCommand.getCheckingId();
+        Long personId = createOrUpdatePersonCheckingCommand.getPersonId();
+        LocalDateTime date = createOrUpdatePersonCheckingCommand.getDate().toDateTimeAtStartOfDay().toLocalDateTime();
+        String threeDaysTime = createOrUpdatePersonCheckingCommand.getThreeDaysTime();
+        try {
+            Checking newChecking = checkingCommandService.createOrUpdatePersonChecking(id, personId, date, threeDaysTime);
+        }
+        catch (PersonNotFoundException e) {
+            log.error("Error creating or updating checking record: " + e.getMessage());
+            throw e;
+        }
+        // Create a new CheckingAggregate from the new Checking
+        CheckingAggregate checkingAggregate = new CheckingAggregate(createOrUpdatePersonCheckingCommand);
+
+        // Save the new CheckingAggregate using the eventSourceHandler
+        eventSourceHandler.save(checkingAggregate);
 
     }
     /**
@@ -100,6 +121,25 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
      */
     @Override
     public void handle(CreatePersonsCheckingCommand createPersonsCheckingCommand) {
+        // Extract the necessary information from the command object
+      List<Long> personIds = createPersonsCheckingCommand.getPersonIds();
+        LocalDate date = createPersonsCheckingCommand.getDate();
+        String threeDaysTime = createPersonsCheckingCommand.getThreeDaysTime();
+        try {
+          List<Checking> checkings =   checkingCommandService.createPersonsChecking(personIds, date, threeDaysTime);
+            createPersonsCheckingCommand.setCheckings(checkings);
+            // Create a new CheckingAggregate from the new Checking
+            CheckingAggregate checkingAggregate = new CheckingAggregate(createPersonsCheckingCommand);
+
+            // Save the new CheckingAggregate using the eventSourceHandler
+            eventSourceHandler.save(checkingAggregate);
+        }
+        catch (PersonNotFoundException e) {
+            log.error("Error creating checking records: " + e.getMessage());
+            throw e;
+        }
+
+
 
     }
     /**
@@ -108,6 +148,25 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
      */
     @Override
     public void handle(CreatePersonsCheckingWithCollectiveCommand createPersonsCheckingWithCollectiveCommand) {
+        // Extract the necessary information from the command object
+        List<Long> personIds = createPersonsCheckingWithCollectiveCommand.getPersonIds();
+        LocalDate date = createPersonsCheckingWithCollectiveCommand.getDate();
+        String threeDaysTime = createPersonsCheckingWithCollectiveCommand.getThreeDaysTime();
+        boolean collective = createPersonsCheckingWithCollectiveCommand.isCollective();
+        try {
+          List<Checking> checkings =  checkingCommandService.createPersonsChecking(personIds, date, threeDaysTime, collective);
+          createPersonsCheckingWithCollectiveCommand.setCheckings(checkings);
+            // Create a new CheckingAggregate from the new Checking
+            CheckingAggregate checkingAggregate = new CheckingAggregate(createPersonsCheckingWithCollectiveCommand);
+
+            // Save the new CheckingAggregate using the eventSourceHandler
+            eventSourceHandler.save(checkingAggregate);
+        }
+        catch (PersonNotFoundException e) {
+            log.error("Error creating checking records: " + e.getMessage());
+            throw e;
+        }
+
 
     }
 }

@@ -27,4 +27,5 @@ public class PersonsCheckingCreatedEvent extends BaseEvent {
     private List<Long> personIds; // IDs of persons involved in the checking
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing
+    private List<Checking> checkings;
 }

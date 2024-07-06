@@ -1,5 +1,6 @@
 package com.example.employepoc.command.commands;
 
+import com.example.employepoc.command.rest.dto.Checking;
 import com.hydatis.cqrsref.commands.BaseCommand;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,5 @@ public class CreatePersonsCheckingWithCollectiveCommand extends BaseCommand {
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing
     private boolean collective; // Flag indicating if the checking is collective
+    private List<Checking> checkings;
 }

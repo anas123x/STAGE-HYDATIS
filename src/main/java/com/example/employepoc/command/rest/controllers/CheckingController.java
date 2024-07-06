@@ -1,16 +1,15 @@
 package com.example.employepoc.command.rest.controllers;
 
-import com.example.employepoc.command.commands.CreateCheckingCommand;
-import com.example.employepoc.command.commands.DeletePersonCheckingCommand;
+import com.example.employepoc.command.commands.*;
 import com.example.employepoc.command.exceptions.CheckingCreatedException;
 import com.example.employepoc.command.exceptions.CheckingDeletedException;
 import com.example.employepoc.command.exceptions.PersonNotFoundException;
 import com.example.employepoc.command.rest.dto.Checking;
-import com.example.employepoc.command.rest.requests.CreateCheckingRequest;
-import com.example.employepoc.command.rest.requests.DeletePersonCheckingRequest;
+import com.example.employepoc.command.rest.requests.*;
 import com.example.employepoc.command.rest.response.CheckingResponse;
 import com.hydatis.cqrsref.infrastructure.CommandDispatcher;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.LocalDate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +49,7 @@ public class CheckingController {
         createCheckingCommand.setId(UUID.randomUUID().toString());
         createCheckingCommand.setPersonId(personId);
         createCheckingCommand.setChecking(checking);
+
         createCheckingCommand.setOthers(others);
         try {
             commandDispatcher.send(createCheckingCommand);
@@ -98,4 +98,84 @@ public class CheckingController {
                 .message("Checking deleted successfully").
                 build());
     }
+
+    @PostMapping("/createOrUpdate")
+    public ResponseEntity<CheckingResponse> createOrUpdateChecking(@RequestBody CreateOrUpdateCheckingRequest checkingRequest) {
+        CreateOrUpdatePersonCheckingCommand checkingCommand = new CreateOrUpdatePersonCheckingCommand();
+        checkingCommand.setCheckingId(checkingRequest.getCheckingId());
+        checkingCommand.setPersonId(checkingRequest.getPersonId());
+        checkingCommand.setDate(checkingRequest.getDate());
+        checkingCommand.setThreeDaysTime(checkingRequest.getThreeDaysTime());
+
+        try {
+            commandDispatcher.send(checkingCommand);
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.status(404).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.status(500).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        }
+
+        return ResponseEntity.status(201).body(new CheckingResponse().builder()
+                .message("Checking created or updated successfully")
+                .build());
+    }
+
+    @PostMapping("/createMultiple")
+    public ResponseEntity<CheckingResponse> createMultipleCheckings(@RequestBody CreatePersonsCheckingRequest checkingRequest) {
+        CreatePersonsCheckingCommand CPCR = new CreatePersonsCheckingCommand();
+        CPCR.setPersonIds( checkingRequest.getPersonIds());
+        CPCR.setDate(checkingRequest.getDate());
+        CPCR.setThreeDaysTime(checkingRequest.getThreeDaysTime());
+
+        try {
+            commandDispatcher.send(CPCR);
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.status(404).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.status(500).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        }
+
+        return ResponseEntity.status(201).body(new CheckingResponse().builder()
+                .message("Checkings created successfully")
+
+                .build());
+    }
+    @PostMapping("/createMultipleWithCollective")
+    public ResponseEntity<CheckingResponse> createMultipleCheckingsWithCollective(@RequestBody CreatePersonsCheckingWithCollectiveRequest checkingRequest) {
+        CreatePersonsCheckingWithCollectiveCommand CPCR = new CreatePersonsCheckingWithCollectiveCommand();
+        CPCR.setPersonIds( checkingRequest.getPersonIds());
+        CPCR.setDate(checkingRequest.getDate());
+        CPCR.setThreeDaysTime(checkingRequest.getThreeDaysTime());
+        CPCR.setCollective(checkingRequest.isCollective());
+
+        try {
+            commandDispatcher.send(CPCR);
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.status(404).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.status(500).body(new CheckingResponse().builder()
+                    .message(e.getMessage())
+                    .build());
+        }
+
+        return ResponseEntity.status(201).body(new CheckingResponse().builder()
+                .message("Collective checkings created successfully")
+                .build());
+    }
+
+
+
 }

@@ -8,7 +8,9 @@ import com.example.employepoc.query.rest.repository.PersonQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -36,7 +38,8 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
 
         // Convert the event's checking to your Checking entity
         Checking checkingEntity = new Checking();
-        checkingEntity.setId(UUID.randomUUID().toString());
+        checkingEntity.setId(event.getChecking().getId()
+        );
         checkingEntity.setActualTime(event.getChecking().getActualTime());
         checkingEntity.setLogicalTime(event.getChecking().getLogicalTime());
         checkingEntity.setData(event.getChecking().getData());
@@ -66,7 +69,44 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
      */
     @Override
     public void on(PersonCheckingCreatedOrUpdatedEvent event) {
-        // Implementation goes here
+        try {
+            // Fetch the person from the database
+            Person person = personQueryRepository.findById(event.getPersonId())
+                    .orElseThrow(() -> new RuntimeException("Person with ID " + event.getPersonId() + " not found."));
+
+            // Create or update the checking
+            Checking checking;
+            if (event.getCheckingId() != null && !event.getCheckingId().isEmpty()) {
+                // Attempt to update existing checking
+                checking = repository.findById(event.getCheckingId())
+                        .orElseThrow(() -> new RuntimeException("Checking with ID " + event.getCheckingId() + " not found."));
+            } else {
+                // Create a new checking
+                checking = new Checking();
+                checking.setId(UUID.randomUUID().toString()); // Generate a new ID for the checking
+            }
+
+            // Set properties from the event
+            checking.setActualTime(event.getDate().toDateTimeAtStartOfDay().toLocalDateTime()); // Assuming conversion is needed
+            checking.setPerson(person);
+            checking.setLogicalTime(event.getDate().toDateTimeAtStartOfDay().toLocalDateTime());
+            checking.setDirectionGenerated(true); // Example: Set direction generated flag
+            checking.setIgnoredByCalc(false); // Example: Set ignored by calculation flag
+            checking.setTimesheetId(1001L); // Example: Set timesheet ID
+            checking.setUsed(false);
+            checking.setActualSource(Checking.CheckingSource.USER);
+            checking.setDirection(Checking.CheckingDirection.IN);
+            checking.setMatricule(person.getMatricule()); // Example: Set matricule from person
+            // Additional properties like direction, source, etc., should be set here based on your application's requirements
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("threeDaysTime", event.getThreeDaysTime());
+            checking.setData(dataMap);
+            // Save the checking
+            repository.save(checking);
+        } catch (Exception e) {
+            System.out.println("Error processing PersonCheckingCreatedOrUpdatedEvent: " + e.getMessage());
+            // Handle exception as needed
+        }
     }
 
     /**
@@ -118,6 +158,40 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
     @Override
     public void on(PersonsCheckingCreatedWithCollectiveEvent event) {
         // Implementation goes here
+        for (int i = 0; i < event.getPersonIds().size(); i++) {
+            Long personId = event.getPersonIds().get(i);
+            try {
+                // Fetch the person from the database
+                Person person = personQueryRepository.findById(personId)
+                        .orElseThrow(() -> new RuntimeException("Person with ID " + personId + " not found."));
+
+                // Create a new checking
+                Checking checking = new Checking();
+                checking.setId(event.getCheckings().get(i).getId());
+                checking.setActualTime(event.getDate().toDateTimeAtStartOfDay().toLocalDateTime()); // Assuming conversion is needed
+                checking.setLogicalTime(event.getDate().toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setPerson(person);
+                checking.setDirectionGenerated(true); // Example: Set direction generated flag
+                checking.setIgnoredByCalc(false); // Example: Set ignored by calculation flag
+                checking.setTimesheetId(1001L); // Example: Set timesheet ID
+                checking.setUsed(false);
+                checking.setActualSource(Checking.CheckingSource.USER); // Assuming USER as source
+                checking.setDirection(Checking.CheckingDirection.IN); // Assuming IN as direction
+                checking.setMatricule(person.getMatricule()); // Set matricule from person
+
+                // Additional properties like direction, source, etc., should be set here based on your application's requirements
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("threeDaysTime", event.getThreeDaysTime());
+                dataMap.put("collective",event.isCollective() ? "true" : "false");
+                checking.setData(dataMap);
+
+                // Save the checking
+                repository.save(checking);
+            } catch (Exception e) {
+                System.out.println("Error processing PersonsCheckingCreatedWithCollectiveEvent for person ID " + personId + ": " + e.getMessage());
+                // Handle exception as needed
+            }
+        }
     }
 
     /**
@@ -128,6 +202,38 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
      */
     @Override
     public void on(PersonsCheckingCreatedEvent event) {
-        // Implementation goes here
+        for (int i = 0; i < event.getPersonIds().size(); i++) {
+            Long personId = event.getPersonIds().get(i);
+            try {
+                // Fetch the person from the database
+                Person person = personQueryRepository.findById(personId)
+                        .orElseThrow(() -> new RuntimeException("Person with ID " + personId + " not found."));
+
+                // Create a new checking
+                Checking checking = new Checking();
+                checking.setId(event.getCheckings().get(i).getId());
+                checking.setActualTime(event.getDate().toDateTimeAtStartOfDay().toLocalDateTime()); // Assuming conversion is needed
+                checking.setLogicalTime(event.getDate().toDateTimeAtStartOfDay().toLocalDateTime());
+                checking.setPerson(person);
+                checking.setDirectionGenerated(true); // Example: Set direction generated flag
+                checking.setIgnoredByCalc(false); // Example: Set ignored by calculation flag
+                checking.setTimesheetId(1001L); // Example: Set timesheet ID
+                checking.setUsed(false);
+                checking.setActualSource(Checking.CheckingSource.USER); // Assuming USER as source
+                checking.setDirection(Checking.CheckingDirection.IN); // Assuming IN as direction
+                checking.setMatricule(person.getMatricule()); // Set matricule from person
+
+                // Additional properties like direction, source, etc., should be set here based on your application's requirements
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("threeDaysTime", event.getThreeDaysTime());
+                checking.setData(dataMap);
+
+                // Save the checking
+                repository.save(checking);
+            } catch (Exception e) {
+                System.out.println("Error processing PersonsCheckingCreatedEvent for person ID " + personId + ": " + e.getMessage());
+                // Handle exception as needed
+            }
+        }
     }
 }
