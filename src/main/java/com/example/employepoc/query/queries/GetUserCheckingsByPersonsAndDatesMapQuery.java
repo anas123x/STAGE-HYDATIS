@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.joda.time.LocalDate;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Collection;
 
@@ -20,6 +21,6 @@ import java.util.Collection;
 @Getter
 @AllArgsConstructor
 public class GetUserCheckingsByPersonsAndDatesMapQuery extends BaseQuery {
-    private Map<Long, Person> persons;
+    private List<Long> personsIds;
     private Collection<LocalDate> dates;
 }

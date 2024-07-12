@@ -20,6 +20,10 @@ import org.joda.time.LocalDate;
 import java.util.Map;
 import java.util.Collection;
 
+/**
+ * Represents a query to retrieve checkings for multiple persons across multiple dates, organized by date then person ID.
+ * This query extends {@link BaseQuery}, utilizing its basic query functionalities.
+ */
 @Data
 @Getter
 @AllArgsConstructor

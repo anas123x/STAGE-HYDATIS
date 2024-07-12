@@ -1,6 +1,7 @@
 package com.example.employepoc.query.events;
 
 import com.example.employepoc.command.events.*;
+import com.example.employepoc.command.exceptions.PersonNotFoundException;
 import com.example.employepoc.query.rest.dto.Checking;
 import com.example.employepoc.query.rest.dto.Person;
 import com.example.employepoc.query.rest.repository.CheckingQueryRepository;
@@ -120,31 +121,23 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
     public void on(PersonCheckingDeletedEvent event) {
         System.out.println("Checking deleted event received" + event.toString());
         boolean duplicate = event.isDuplicate();
-        Checking checking = new Checking();
-        checking.setActualTime(event.getChecking().getActualTime());
-        checking.setActualSource(com.example.employepoc.query.rest.dto.Checking.CheckingSource.valueOf(event.getChecking().getActualSource().name()));
-        checking.setDirection(com.example.employepoc.query.rest.dto.Checking.CheckingDirection.valueOf(event.getChecking().getDirection().name()));
         Person p = personQueryRepository.findById(event.getChecking().getPerson().getId()).get();
-        checking.setPerson(p);
-        if (duplicate) {
-            List<Checking> checkings = repository.findByPersonIdAndActualTimeAndDirectionAndActualSource(
-                    checking.getPerson().getId(),
-                    checking.getActualTime(),
-                    checking.getDirection(),
-                    checking.getActualSource()
-            );
-            if (checkings.size() > 1) {
+        List<Checking> checkings = repository.findByPersonIdAndActualTimeAndDirectionAndActualSource(
+                event.getChecking().getPerson().getId(),
+                event.getChecking().getActualTime(),
+                com.example.employepoc.query.rest.dto.Checking.CheckingDirection.valueOf(event.getChecking().getDirection().name()),
+
+                com.example.employepoc.query.rest.dto.Checking.CheckingSource.valueOf(event.getChecking().getActualSource().name())
+        );
+        if (duplicate && checkings.size() >1) {
                 for (Checking c : checkings) {
                     c.setDeleted(true);
                     repository.save(c);
+
                 }
-            } else {
-                checkings.get(0).setDeleted(true);
-                repository.save(checkings.get(0));
-            }
         } else {
-            checking.setDeleted(true);
-            repository.save(checking);
+            checkings.get(0).setDeleted(true);
+            repository.save(checkings.get(0));
         }
 
     }

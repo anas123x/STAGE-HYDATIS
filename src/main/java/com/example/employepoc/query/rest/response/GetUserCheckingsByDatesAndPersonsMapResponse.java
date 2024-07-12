@@ -5,13 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.joda.time.LocalDate;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Represents the response structure for queries fetching checkings for a specific day.
+ * Represents the response structure for queries fetching checkings by date ranges and person IDs.
  * This class extends {@link BaseResponse} to include a message alongside the main data.
- * The main data is a collection of {@link Checking} objects representing the checkings for the day.
+ * The main data is a nested map where the first key is a LocalDate,
+ * and the value is another map with person IDs as keys and lists of {@link Checking} objects as values.
  *
  * @Data Generates getters and setters for the class fields.
  * @SuperBuilder Enables the builder pattern for this class, facilitating an easier way to create instances.
@@ -22,26 +25,19 @@ import java.util.Collection;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetDayCheckingsResponse extends BaseResponse{
-    // Collection of checkings for the specified day.
-    private Collection<Checking> checkings;
+public class GetUserCheckingsByDatesAndPersonsMapResponse extends BaseResponse{
+    // Map structure holding the checkings information. The outer map's key is the LocalDate,
+    // the inner map's key is the person's ID, and the value is a list of checkings for that person on that date.
+    private Map<LocalDate, Map<Long, List<Checking>>> checkings;
 
     /**
      * Constructs a new response object with a message and checkings data.
      *
      * @param message The message associated with the response, typically used for indicating the status or result of the query.
-     * @param checkings The collection of checkings data for the day.
+     * @param checkings The nested map of checkings data, organized by date and person ID.
      */
-    public GetDayCheckingsResponse(String message, Collection<Checking> checkings) {
+    public GetUserCheckingsByDatesAndPersonsMapResponse(String message, Map<LocalDate, Map<Long, List<Checking>>> checkings) {
         super(message);
-        this.checkings = checkings;
-    }
-
-    public Collection<Checking> getCheckings() {
-        return checkings;
-    }
-
-    public void setCheckings(Collection<Checking> checkings) {
         this.checkings = checkings;
     }
 }

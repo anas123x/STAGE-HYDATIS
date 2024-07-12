@@ -11,6 +11,11 @@ import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a role entity stored in MongoDB.
+ * This class extends {@link BaseBean} and is annotated with {@link Document} to indicate its collection name in MongoDB.
+ * It encapsulates role-specific fields such as name, description, color, and grants among others.
+ */
 @NoArgsConstructor
 @Getter
 @Setter

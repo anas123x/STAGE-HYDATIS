@@ -9,6 +9,11 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+/**
+ * Response class for listing checkings.
+ * Extends {@link BaseResponse} to include standard response attributes like success status and error messages.
+ * This class is used to encapsulate the response data for requests that fetch a list of checkings.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -16,7 +21,11 @@ import java.util.List;
 public class CheckingsListResponse  extends BaseResponse {
     private String message;
     private List<Checking> checkings;
-
+    /**
+     * Response class for listing checkings.
+     * Extends {@link BaseResponse} to include standard response attributes like success status and error messages.
+     * This class is used to encapsulate the response data for requests that fetch a list of checkings.
+     */
     public CheckingsListResponse(String message) {
         this.message = message;
     }

@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +52,8 @@ public class Checking extends BaseBean implements Comparable<Checking> {
 
 	// by
 	// seif
-
+	@ManyToOne
+	private User user ;
 	public Person getPerson() {
 		return person;
 	}

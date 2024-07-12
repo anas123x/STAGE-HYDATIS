@@ -41,14 +41,13 @@ public class Person extends BaseBean implements Comparable<Person> {
 	private Date	              birthDate;
 	private String	            card;
 	private String	            email;
-/*	private Group	              group;
+	//private Group	              group;
+	@OneToOne
 	private User	              user;
-	private List<Contract>	    contracts	       = new ArrayList<Contract>();*/
+	//private List<Contract>	    contracts	       = new ArrayList<Contract>();
 	private String	            hardId;
 
-	/*
-	 * Ajouter Par Baha eddine wannes
-	 */
+
 
 	private String	            CIN;
 	private String	            PersonnePrevenir;

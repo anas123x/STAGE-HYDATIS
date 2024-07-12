@@ -49,7 +49,7 @@ public class Person extends BaseBean {
 	private String NumUrgence;
 	private String Maladie;
 	private String Affectation;
-
+	private User user;
 	// Indicates if the person should not be synchronized with external systems
 	private boolean nonSynchronizable;
 	// Stores additional attributes as key-value pairs
