@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor // Generates no-arguments constructor
 @Builder // Provides a builder pattern for object construction
 public class CreatePersonsCheckingWithCollectiveCommand extends BaseCommand {
-    private String id; // Unique identifier for the command
+    private String id; // Unique identifier for2 the command
     private List<Long> personIds; // IDs of the persons associated with the checking
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing

@@ -52,9 +52,8 @@ public class User extends BaseBean {
     private Person	          person;
     @OneToMany
     @JoinTable(
-            name = "user_checkings",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "checking_id")
+            name = "user_checkings"
+
     )
     private List<Checking> checkings = new ArrayList<>();
 

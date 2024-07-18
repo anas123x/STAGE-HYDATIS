@@ -29,13 +29,31 @@ services:
     ports:
       - "27017:27017" # Expose MongoDB on port 27017
 
-  app:
-    build:
-      context: ./ # Context for building the application's Docker image
-      dockerfile: dockerfile # Name of the Dockerfile
+  keycloak:
+    image: quay.io/keycloak/keycloak:20.0.0
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres # Use service name defined in this file
+      KC_DB_URL_DATABASE: postgres # Example value for Keycloak database name
+      KC_DB_USERNAME: postgres # Example value for Keycloak database user
+      KC_DB_SCHEMA: public
+      KC_DB_PASSWORD:
+      KEYCLOAK_ADMIN: admin # Example value for Keycloak admin username
+      KEYCLOAK_ADMIN_PASSWORD: admin # Example value for Keycloak admin password
+    command:
+      - "start-dev --http-port=8080"
     ports:
-      - "8080:8080" # Expose the application on port 8080
+      - 8080:8080
     depends_on:
-      - kafka
       - postgres
-      - mongo # The application depends on Kafka, PostgreSQL, and MongoDB services
+
+#  app:
+#    build:
+#      context: ./ # Context for building the application's Docker image
+#      dockerfile: dockerfile # Name of the Dockerfile
+#    ports:
+#      - "8080:8080" # Expose the application on port 8080
+#    depends_on:
+#      - kafka
+#      - postgres
+#      - mongo # The application depends on Kafka, PostgreSQL, and MongoDB services

@@ -1,42 +1,67 @@
 server:
-  port: 8080 # Specifies the port on which the server will listen for requests.
+  port: 8081
+
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: timestamp-realm
+  resource: timestamp-client
+  credentials:
+    secret: jo4V8zDiNCvf6Tad5Ckyv2qp0Drm1MDs
+  use-resource-role-mappings: true
+  bearer-only: true
+  ssl-required: NONE
+
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/timestamp-realm
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres # JDBC URL for the PostgreSQL database.
-    username: postgres # Username for the PostgreSQL database.
-    password: admin # Password for the PostgreSQL database.
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: admin
+
   jpa:
-    show-sql: true # Enables logging of the SQL statements.
+    show-sql: true
     hibernate:
-      ddl-auto: update # Hibernate DDL auto-generation strategy.
+      ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect # Specifies the Hibernate SQL dialect for PostgreSQL.
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/POC # URI for the MongoDB database.
+      uri: mongodb://localhost:27017/POC
 
   kafka:
     producer:
-      bootstrap-servers: localhost:9092 # Kafka bootstrap servers for the producer.
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Serializer class for key that implements the Serializer interface.
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # Serializer class for value that implements the Serializer interface.
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring:
           json:
             trusted:
-              packages: '*' # Packages to trust for serialization/deserialization.
+              packages: '*'
+
     consumer:
-      bootstrap-servers: localhost:9092 # Kafka bootstrap servers for the consumer.
-      group-id: employee-consumer # Consumer group ID.
-      auto-offset-reset: latest # What to do when there is no initial offset in Kafka or if the current offset does not exist any more on the server.
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # Deserializer class for key that implements the Deserializer interface.
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer # Deserializer class for value that implements the Deserializer interface.
+      bootstrap-servers: localhost:9092
+      group-id: employee-consumer
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring:
           json:
             trusted:
-              packages: '*' # Packages to trust for serialization/deserialization.
+              packages: '*'
+
     listener:
-      ack-mode: MANUAL_IMMEDIATE # Acknowledgment mode for Kafka listener.
+      ack-mode: MANUAL_IMMEDIATE
+
+logging:
+  level:
+    org.keycloak: DEBUG
+    org.springframework.security: DEBUG

@@ -19,10 +19,10 @@ import javax.persistence.Table;
 @Table(name = "grant")
 @Builder
 public class Grant extends BaseEntity {
-    @Id
-    private long Id;
+
     private static final long	serialVersionUID	= 1L;
     private String	          data;
+    @Id
     private String	          idg;
 
     public Grant() {

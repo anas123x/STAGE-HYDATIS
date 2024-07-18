@@ -55,6 +55,9 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
             Person p = personQueryRepository.findById(event.getPersonId()).get();
             checkingEntity.setPerson(p);
             checkingEntity.setMatricule(p.getMatricule());
+            if(!(p.getUser()==null)){
+                checkingEntity.setUser(p.getUser());
+            }
             repository.save(checkingEntity);
         } catch (Exception e) {
             System.out.println(e);
@@ -150,6 +153,8 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
      */
     @Override
     public void on(PersonsCheckingCreatedWithCollectiveEvent event) {
+        System.out.println("event recieved "+event);
+
         // Implementation goes here
         for (int i = 0; i < event.getPersonIds().size(); i++) {
             Long personId = event.getPersonIds().get(i);
@@ -177,7 +182,7 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
                 dataMap.put("threeDaysTime", event.getThreeDaysTime());
                 dataMap.put("collective",event.isCollective() ? "true" : "false");
                 checking.setData(dataMap);
-
+                System.out.println("mesg");
                 // Save the checking
                 repository.save(checking);
             } catch (Exception e) {

@@ -6,6 +6,7 @@ import com.example.employepoc.command.rest.dto.Checking;
 import com.example.employepoc.command.rest.requests.*;
 import com.example.employepoc.command.rest.response.CheckingResponse;
 import com.hydatis.cqrsref.infrastructure.CommandDispatcher;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/checking")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "keycloak")
 public class CheckingCommandController {
 
     private final CommandDispatcher commandDispatcher;

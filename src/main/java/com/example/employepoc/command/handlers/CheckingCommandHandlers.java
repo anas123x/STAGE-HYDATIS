@@ -84,7 +84,11 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
             }
 
     }
-
+    /**
+     * Handles the creation or update  of a new checking record.
+     * Extracts information from the command, creates a new checking record, and persists the event.
+     * @param createOrUpdatePersonCheckingCommand  containing the details for creating or updating a new checking record.
+     */
     @Override
     public void handle(CreateOrUpdatePersonCheckingCommand createOrUpdatePersonCheckingCommand) {
         // Extract the necessary information from the command object
@@ -264,8 +268,10 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
      * Handles the creation of checking records for multiple persons with collective information.
      * @param createPersonsCheckingWithCollectiveCommand Command containing the details for creating checking records for multiple persons with additional collective information.
      */
-    @Override
+     @Override
     public void handle(CreatePersonsCheckingWithCollectiveCommand createPersonsCheckingWithCollectiveCommand) {
+        System.out.println("mesg handler first");
+
         // Extract the necessary information from the command object
         List<Long> personIds = createPersonsCheckingWithCollectiveCommand.getPersonIds();
         LocalDate date = createPersonsCheckingWithCollectiveCommand.getDate();
@@ -273,8 +279,9 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
         boolean collective = createPersonsCheckingWithCollectiveCommand.isCollective();
         try {
             List<Checking> checkings = new ArrayList<>();
+
             for (Long personId : personIds) {
-                try {
+
                     Person person = personCommandRepository.findById(personId)
                             .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
 
@@ -291,22 +298,17 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
                     checking.setUserSetTime(date.toDateTimeAtStartOfDay().toLocalDateTime());
                     checking.setTimesheetId(1001L);
                     checking.setUsed(false);
-
                     Map<String, String> dataMap = new HashMap<>();
                     dataMap.put("threeDaysTime", threeDaysTime);
                     dataMap.put("collective",collective ? "true" : "false");
                     checking.setData(dataMap);
+                    checkings.add(checking);
 
 
+            }
+            createPersonsCheckingWithCollectiveCommand.setCheckings(checkings);
 
-                    checkings.add(checkingCommandRepository.save(checking));
-                } catch (PersonNotFoundException e){
-                    throw new PersonNotFoundException("Error creating checking records: " + e.getMessage());
-                }
-                catch (Exception e) {
-                    throw new RuntimeException("Error creating checkings for person ID " + personId + ": " + e.getMessage());
-                }
-            }          createPersonsCheckingWithCollectiveCommand.setCheckings(checkings);
+            checkingCommandRepository.saveAll(checkings);
             // Create a new CheckingAggregate from the new Checking
             CheckingAggregate checkingAggregate = new CheckingAggregate(createPersonsCheckingWithCollectiveCommand);
 
@@ -317,6 +319,12 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
             log.error("Error creating checking records: " + e.getMessage());
             throw e;
         }
+        catch (Exception e)
+        {
+            log.error("Error creating checking records: " + e.getMessage());
+            throw new RuntimeException("Error creating checking records: " + e.getMessage());
+        }
+
 
 
     }

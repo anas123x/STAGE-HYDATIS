@@ -276,28 +276,33 @@ public class CheckingCommandHandlerTest {
      */
     @Test
     void handle_CreatePersonsCheckingWithCollective_Success() {
+        // Setup command with multiple person IDs
         List<Long> personIds = List.of(person.getId());
         CreatePersonsCheckingWithCollectiveCommand command = CreatePersonsCheckingWithCollectiveCommand.builder()
                 .personIds(personIds)
-                .date(LocalDateTime.now().toLocalDate())
+                .date(LocalDate.now()) // Adjust to LocalDate as per handler
                 .threeDaysTime("3 days")
                 .collective(true)
                 .build();
 
-        when(personCommandRepository.findById(person.getId())).thenReturn(Optional.of(person));
-        when(checkingCommandRepository.save(any(Checking.class))).thenAnswer(invocation -> {
-            Checking savedChecking = invocation.getArgument(0);
-            savedChecking.setId(UUID.randomUUID().toString());
-            return savedChecking;
-        });
+        // Mock repository findById to return the person for each ID
+        when(personCommandRepository.findById(anyLong())).thenReturn(Optional.of(person));
 
+        // Mock repository saveAll to return the input list
+        when(checkingCommandRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Execute the handler with the command
         checkingCommandHandlers.handle(command);
 
-        verify(personCommandRepository, times(1)).findById(person.getId());
-        verify(checkingCommandRepository, times(1)).save(any(Checking.class));
+        // Verify findById was called for each person ID
+        personIds.forEach(id -> verify(personCommandRepository, times(1)).findById(id));
+
+        // Verify saveAll was called with a list of Checkings
+        verify(checkingCommandRepository, times(1)).saveAll(anyList());
+
+        // Verify eventSourceHandler.save was called with a CheckingAggregate
         verify(eventSourceHandler, times(1)).save(any(CheckingAggregate.class));
     }
-
     /**
      * Tests handling of the CreatePersonsCheckingWithCollectiveCommand when a specified person is not found.
      * Verifies that a PersonNotFoundException is thrown.

@@ -5,6 +5,7 @@ import com.example.employepoc.command.rest.dto.Person;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -16,9 +17,12 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Document(collection = "users")
+@NoArgsConstructor
 @Builder
 @ToString
 public class User extends BaseBean {
+    @Id
+    private long id;
     private static final long	serialVersionUID	  = 1L;
     public static final int	  ACTIVE_CONTRACT	    = 1231;
     public static final int	  NOT_ACTIVE_CONTRACT	= 1237;

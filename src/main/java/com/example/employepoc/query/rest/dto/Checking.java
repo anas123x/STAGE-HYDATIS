@@ -4,6 +4,7 @@ import com.example.employepoc.command.rest.dto.BaseBean;
 import com.hydatis.cqrsref.domain.BaseEntity;
 import lombok.*;
 import org.joda.time.LocalDateTime;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -44,9 +45,10 @@ public class Checking extends BaseEntity implements Comparable<Checking> {
 	private Long	              timesheetId;
 	@Field("checking_deleted")
 	private boolean deleted=false;
-
+	@DBRef
 	private Person person;	                                           // added
-
+	@DBRef
+	private User user ;	                                           // added
 	// by
 	// seif
 
