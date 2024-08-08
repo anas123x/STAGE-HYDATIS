@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  * Extends {@link MongoRepository} to provide standard MongoDB operations for {@link Person} entities.
  */
 @Repository
-public interface PersonQueryRepository extends MongoRepository<Person, Long> {
+public interface PersonQueryRepository extends MongoRepository<Person, String> {
 }

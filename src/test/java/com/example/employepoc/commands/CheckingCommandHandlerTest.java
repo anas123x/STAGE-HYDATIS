@@ -59,7 +59,7 @@ public class CheckingCommandHandlerTest {
     @BeforeEach
     void setUp() {
         person = Person.builder()
-                .id(1L)
+                .id(UUID.randomUUID().toString())
                 .matricule("MAT001")
                 .build();
 
@@ -134,7 +134,7 @@ public class CheckingCommandHandlerTest {
 
         when(personCommandRepository.findById(person.getId())).thenReturn(Optional.of(person));
         when(checkingCommandRepository.findByPersonIdAndActualTimeAndDirectionAndActualSource(
-                anyLong(), any(), any(), any()))
+                anyString(), any(), any(), any()))
                 .thenReturn(List.of(checkingToDelete));
 
         checkingCommandHandlers.handle(deleteCommand);
@@ -228,7 +228,7 @@ public class CheckingCommandHandlerTest {
      */
     @Test
     void handle_CreatePersonsChecking_Success() {
-        List<Long> personIds = List.of(person.getId());
+        List<String> personIds = List.of(person.getId());
         CreatePersonsCheckingCommand createPersonsCommand = CreatePersonsCheckingCommand.builder()
                 .personIds(personIds)
                 .date(LocalDateTime.now().toLocalDate())
@@ -255,7 +255,7 @@ public class CheckingCommandHandlerTest {
      */
     @Test
     void handle_CreatePersonsChecking_PersonNotFound() {
-        List<Long> personIds = List.of(person.getId());
+        List<String> personIds = List.of(person.getId());
         CreatePersonsCheckingCommand createPersonsCommand = CreatePersonsCheckingCommand.builder()
                 .personIds(personIds)
                 .date(LocalDateTime.now().toLocalDate())
@@ -277,7 +277,7 @@ public class CheckingCommandHandlerTest {
     @Test
     void handle_CreatePersonsCheckingWithCollective_Success() {
         // Setup command with multiple person IDs
-        List<Long> personIds = List.of(person.getId());
+        List<String> personIds = List.of(person.getId());
         CreatePersonsCheckingWithCollectiveCommand command = CreatePersonsCheckingWithCollectiveCommand.builder()
                 .personIds(personIds)
                 .date(LocalDate.now()) // Adjust to LocalDate as per handler
@@ -286,7 +286,7 @@ public class CheckingCommandHandlerTest {
                 .build();
 
         // Mock repository findById to return the person for each ID
-        when(personCommandRepository.findById(anyLong())).thenReturn(Optional.of(person));
+        when(personCommandRepository.findById(anyString())).thenReturn(Optional.of(person));
 
         // Mock repository saveAll to return the input list
         when(checkingCommandRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -309,7 +309,7 @@ public class CheckingCommandHandlerTest {
      */
     @Test
     void handle_CreatePersonsCheckingWithCollective_PersonNotFound() {
-        List<Long> personIds = List.of(person.getId());
+        List<String> personIds = List.of(person.getId());
         CreatePersonsCheckingWithCollectiveCommand command = CreatePersonsCheckingWithCollectiveCommand.builder()
                 .personIds(personIds)
                 .date(LocalDateTime.now().toLocalDate())

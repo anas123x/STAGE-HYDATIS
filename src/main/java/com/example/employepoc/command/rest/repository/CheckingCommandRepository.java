@@ -29,7 +29,7 @@ public interface CheckingCommandRepository extends JpaRepository<Checking, Strin
      */
     @Query("SELECT c FROM Checking c WHERE c.person.id = :personId AND c.actualTime = :actualTime AND c.direction = :direction AND c.actualSource = :actualSource")
     List<Checking> findByPersonIdAndActualTimeAndDirectionAndActualSource(
-            @Param("personId") Long personId,
+            @Param("personId") String personId,
             @Param("actualTime") LocalDateTime actualTime,
             @Param("direction") Checking.CheckingDirection direction,
             @Param("actualSource") Checking.CheckingSource actualSource

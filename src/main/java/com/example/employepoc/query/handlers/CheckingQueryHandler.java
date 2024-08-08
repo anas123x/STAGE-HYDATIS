@@ -59,7 +59,7 @@ public class CheckingQueryHandler implements CheckingQueryHandlerInterface {
      * @return A map where each key is a person's ID and the value is a list of {@link Checking} instances for that person.
      */
     @Override
-    public Map<Long, List<Checking>> handle(GetPersonsCheckingsQuery query) {
+    public Map<String, List<Checking>> handle(GetPersonsCheckingsQuery query) {
         log.info("Handling GetPersonsCheckingsQuery: {}", query);
         return repository.findAll().stream()
                 .filter(checking -> query.getPersonsId().contains(checking.getPerson().getId())
@@ -75,11 +75,11 @@ public class CheckingQueryHandler implements CheckingQueryHandlerInterface {
      *         The nested map's key is a person's ID and the value is a list of {@link Checking} instances for that date and person.
      */
     @Override
-    public Map<LocalDate, Map<Long, List<Checking>>> handle(GetUserCheckingsByDatesAndPersonsMapQuery query) {
+    public Map<LocalDate, Map<String, List<Checking>>> handle(GetUserCheckingsByDatesAndPersonsMapQuery query) {
         log.info("Handling GetUserCheckingsByDatesAndPersonsMapQuery: {}", query);
         // Assuming personQueryRepository.findById(id) returns an Optional<Person>, hence the need for .orElse(null).
         // Adjust according to your actual method signature and handling of missing persons.
-        Map<Long, Person> personsMap = query.getPersonsIds().stream()
+        Map<String, Person> personsMap = query.getPersonsIds().stream()
                 .collect(Collectors.toMap(
                         personId -> personId,
                         personId -> personQueryRepository.findById(personId).orElse(null)
@@ -107,10 +107,10 @@ public class CheckingQueryHandler implements CheckingQueryHandlerInterface {
      *         The nested map's key is a date and the value is a list of {@link Checking} instances for that person and date.
      */
     @Override
-    public Map<Long, Map<LocalDate, List<Checking>>> handle(GetUserCheckingsByPersonsAndDatesMapQuery query) {
+    public Map<String, Map<LocalDate, List<Checking>>> handle(GetUserCheckingsByPersonsAndDatesMapQuery query) {
         log.info("Handling GetUserCheckingsByPersonsAndDatesMapQuery: {}", query);
         // Assuming personQueryRepository.findById(id) returns
-        Map<Long, Person> personsMap = query.getPersonsIds().stream()
+        Map<String, Person> personsMap = query.getPersonsIds().stream()
                 .collect(Collectors.toMap(
                         personId -> personId,
                         personId -> personQueryRepository.findById(personId).orElse(null)
@@ -179,4 +179,17 @@ public class CheckingQueryHandler implements CheckingQueryHandlerInterface {
                         && checking.getActualTime().toLocalDate().equals(query.getDate())
                 )
                 .collect(Collectors.toList());    }
+
+    /**
+     * Retrieves all checkings
+     *
+
+     * @return A collection of {@link Checking}
+     */
+    @Override
+    public List<Checking> handle(GetAllCheckingsQuery query) {
+        return repository.findAll();
+    }
 }
+
+

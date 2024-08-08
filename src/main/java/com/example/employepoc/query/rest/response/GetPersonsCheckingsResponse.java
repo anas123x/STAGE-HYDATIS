@@ -22,7 +22,7 @@ public class GetPersonsCheckingsResponse extends BaseResponse {
     /**
      * A map where each key is a person's ID and the value is a list of {@link Checking} objects associated with that person.
      */
-    private Map<Long, List<Checking>> checkings;
+    private Map<String, List<Checking>> checkings;
 
     /**
      * Constructs a new GetPersonsCheckingsResponse with a message and checkings data.
@@ -30,7 +30,7 @@ public class GetPersonsCheckingsResponse extends BaseResponse {
      * @param message The response message, typically indicating the status or result of the query.
      * @param checkings A map of person IDs to their respective lists of {@link Checking} objects.
      */
-    public GetPersonsCheckingsResponse(String message, Map<Long, List<Checking>> checkings) {
+    public GetPersonsCheckingsResponse(String message, Map<String, List<Checking>> checkings) {
         super(message);
         this.checkings = checkings;
     }

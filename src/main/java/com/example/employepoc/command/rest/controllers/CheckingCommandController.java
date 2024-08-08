@@ -20,7 +20,7 @@ import java.util.UUID;
  * It interacts with the CommandDispatcher to process commands related to checking operations.
  */
 @RestController
-@RequestMapping("/checking")
+@RequestMapping("/checking/user")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "keycloak")
 public class CheckingCommandController {
@@ -39,7 +39,7 @@ public class CheckingCommandController {
     public ResponseEntity<CheckingResponse> saveChecking(@RequestBody CreateCheckingRequest checkingRequest) {
         try {
             Checking checking = checkingRequest.getChecking();
-        Long personId = checkingRequest.getPersonId();
+        String personId = checkingRequest.getPersonId();
         ArrayList<Checking> others = checkingRequest.getOthers();
 
         System.out.println("personId: " + personId + " checking: " + checking + " others: " + others);

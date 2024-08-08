@@ -24,7 +24,8 @@ import java.util.stream.Collectors;
  * within a specified date range.
  */
 @RestController
-@RequestMapping("/checking")
+@RequestMapping("/checking/admin")
+@CrossOrigin(origins = "http://localhost:4200")
 public class CheckingQueryController {
 
     @Autowired
@@ -41,7 +42,7 @@ public class CheckingQueryController {
      */
     @GetMapping("/person/{personId}")
     public ResponseEntity<GetPersonCheckingsResponse> getPersonCheckings(
-            @PathVariable Long personId,
+            @PathVariable String personId,
             @RequestParam("from") String from,
             @RequestParam("to") String to) {
 
@@ -71,14 +72,13 @@ public class CheckingQueryController {
             @RequestParam("from") String from,
             @RequestParam("to") String to) {
 
-        List<Long> personsIdList = Arrays.stream(personsId.split(","))
-                .map(Long::valueOf)
+        List<String> personsIdList = Arrays.stream(personsId.split(","))
                 .collect(Collectors.toList());
 
         LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
         LocalDateTime toDate = LocalDateTime.parse(to, formatter);
 
-        Map<Long, List<Checking>> checkings = (Map<Long, List<Checking>>) queryDispatcher.sendObject(new GetPersonsCheckingsQuery(personsIdList, fromDate, toDate));
+        Map<String, List<Checking>> checkings = (Map<String, List<Checking>>) queryDispatcher.sendObject(new GetPersonsCheckingsQuery(personsIdList, fromDate, toDate));
 
         var response = GetPersonsCheckingsResponse.builder()
                 .checkings(checkings)
@@ -96,7 +96,7 @@ public class CheckingQueryController {
      */
     @GetMapping("/dayCheckings/{personId}")
     public ResponseEntity<GetDayCheckingsResponse> getDayCheckings(
-            @PathVariable Long personId,
+            @PathVariable String personId,
             @RequestParam("date") String date) {
 
         LocalDate localDate = LocalDate.parse(date, DateFormatter);
@@ -118,7 +118,7 @@ public class CheckingQueryController {
      */
     @GetMapping("/collective/{personId}")
     public ResponseEntity<GetDayCheckingsResponse> getCollectiveCheckings(
-            @PathVariable long personId,
+            @PathVariable String personId,
             @RequestParam("date") String date
     ){
         LocalDate localDate = LocalDate.parse(date,DateFormatter);
@@ -140,8 +140,7 @@ public class CheckingQueryController {
     public ResponseEntity<GetUserCheckingsByDatesAndPersonsMapResponse> getUserCheckingsByDatesAndPersonsMap(
             @RequestParam("personsIds") String personsIds,
             @RequestParam("dates") String dates) {
-        List<Long> personsIdsList = Arrays.stream(personsIds.split(","))
-                .map(Long::valueOf)
+        List<String> personsIdsList = Arrays.stream(personsIds.split(","))
                 .collect(Collectors.toList());
         Collection<LocalDate> datesList = Arrays.stream(dates.split(",")).toList().stream()
                 .map(LocalDate::parse)
@@ -165,8 +164,7 @@ public class CheckingQueryController {
     public ResponseEntity<GetUserCheckingsByPersonsAndDatesMapResponse> getUserCheckingsByPersonsAndDatesMap(
             @RequestParam("personsIds") String personsIds,
             @RequestParam("dates") String dates) {
-        List<Long> personsIdsList = Arrays.stream(personsIds.split(","))
-                .map(Long::valueOf)
+        List<String> personsIdsList = Arrays.stream(personsIds.split(","))
                 .collect(Collectors.toList());
         Collection<LocalDate> datesList = Arrays.stream(dates.split(",")).toList().stream()
                 .map(LocalDate::parse)
@@ -187,7 +185,7 @@ public class CheckingQueryController {
      */
     @GetMapping("userCheckings")
     public ResponseEntity<GetPersonCheckingsResponse> getUserCheckings(
-            @RequestParam("personId") Long personId,
+            @RequestParam("personId") String personId,
             @RequestParam("date") String date) {  try {
         LocalDate localDate = LocalDate.parse(date, DateFormatter);
 
@@ -203,5 +201,23 @@ public class CheckingQueryController {
       }
 
     }
+
+
+    /**
+     * Retrieves all checkings for a user.
+     * @return ResponseEntity containing the checkings for the specified user and a success message.
+     */
+    @GetMapping("/getAllCheckings")
+    public ResponseEntity<GetPersonCheckingsResponse> getAllCheckings() {
+        List<Checking> checkings = queryDispatcher.send(new GetAllCheckingsQuery());
+        var response = GetPersonCheckingsResponse.builder()
+                .checkings(checkings)
+                .message("Checkings retrieved successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
 
 }

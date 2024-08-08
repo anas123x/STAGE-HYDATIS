@@ -42,7 +42,7 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
     public void handle(CreateCheckingCommand createCheckingCommand) {
         // Extract the necessary information from the command object
         LocalDateTime localDateTime = createCheckingCommand.getChecking().getActualTime();
-        Long personId = createCheckingCommand.getPersonId();
+        String personId = createCheckingCommand.getPersonId();
         Checking.CheckingDirection cd = createCheckingCommand.getChecking().getDirection();
         Checking.CheckingSource s = createCheckingCommand.getChecking().getActualSource();
 
@@ -52,7 +52,11 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
                 // Fetch the person from the database
                 Person person = personCommandRepository.findById(personId)
                         .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
-
+                List<Checking> c = checkingCommandRepository.findByPersonIdAndActualTimeAndDirectionAndActualSource(personId,localDateTime,cd,s);
+                System.out.println(c);
+                 if (!c.isEmpty()) {
+                 throw new RuntimeException("Checking already exists");
+                 }
                 Checking checking = new Checking();
                 checking.setId(UUID.randomUUID().toString());
                 checking.setActualTime(localDateTime);
@@ -80,6 +84,7 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
                 throw new PersonNotFoundException("Error creating checking: " + e.getMessage());
             }
             catch (Exception e){
+                System.out.println(e);
                 throw new RuntimeException("Error creating checking: " + e.getMessage());
             }
 
@@ -93,7 +98,7 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
     public void handle(CreateOrUpdatePersonCheckingCommand createOrUpdatePersonCheckingCommand) {
         // Extract the necessary information from the command object
         String id = createOrUpdatePersonCheckingCommand.getCheckingId();
-        Long personId = createOrUpdatePersonCheckingCommand.getPersonId();
+        String personId = createOrUpdatePersonCheckingCommand.getPersonId();
         LocalDateTime date = createOrUpdatePersonCheckingCommand.getDate().toDateTimeAtStartOfDay().toLocalDateTime();
         String threeDaysTime = createOrUpdatePersonCheckingCommand.getThreeDaysTime();
 
@@ -211,12 +216,12 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
     @Override
     public void handle(CreatePersonsCheckingCommand createPersonsCheckingCommand) {
         // Extract the necessary information from the command object
-      List<Long> personIds = createPersonsCheckingCommand.getPersonIds();
+      List<String> personIds = createPersonsCheckingCommand.getPersonIds();
         LocalDate date = createPersonsCheckingCommand.getDate();
         String threeDaysTime = createPersonsCheckingCommand.getThreeDaysTime();
         try {
             List<Checking> checkings = new ArrayList<>();
-            for (Long personId : personIds) {
+            for (String personId : personIds) {
                 try {
                     Person person = personCommandRepository.findById(personId)
                             .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));
@@ -273,14 +278,14 @@ public class CheckingCommandHandlers implements CheckingCommandHandlersInterface
         System.out.println("mesg handler first");
 
         // Extract the necessary information from the command object
-        List<Long> personIds = createPersonsCheckingWithCollectiveCommand.getPersonIds();
+        List<String> personIds = createPersonsCheckingWithCollectiveCommand.getPersonIds();
         LocalDate date = createPersonsCheckingWithCollectiveCommand.getDate();
         String threeDaysTime = createPersonsCheckingWithCollectiveCommand.getThreeDaysTime();
         boolean collective = createPersonsCheckingWithCollectiveCommand.isCollective();
         try {
             List<Checking> checkings = new ArrayList<>();
 
-            for (Long personId : personIds) {
+            for (String personId : personIds) {
 
                     Person person = personCommandRepository.findById(personId)
                             .orElseThrow(() -> new PersonNotFoundException("Person with ID " + personId + " not found."));

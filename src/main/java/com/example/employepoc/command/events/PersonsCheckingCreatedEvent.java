@@ -24,7 +24,7 @@ import java.util.List;
 public class PersonsCheckingCreatedEvent extends BaseEvent {
     private String identifier; // Unique identifier for the event
 
-    private List<Long> personIds; // IDs of persons involved in the checking
+    private List<String> personIds; // IDs of persons involved in the checking
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing
     private List<Checking> checkings;

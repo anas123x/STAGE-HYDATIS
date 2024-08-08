@@ -22,7 +22,7 @@ import java.util.List;
 @Builder // Provides a builder pattern for object construction
 public class CreatePersonsCheckingWithCollectiveCommand extends BaseCommand {
     private String id; // Unique identifier for2 the command
-    private List<Long> personIds; // IDs of the persons associated with the checking
+    private List<String> personIds; // IDs of the persons associated with the checking
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing
     private boolean collective; // Flag indicating if the checking is collective

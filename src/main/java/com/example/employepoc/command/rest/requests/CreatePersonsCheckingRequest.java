@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Data
 public class CreatePersonsCheckingRequest {
-    private List<Long> personIds;
+    private List<String> personIds;
     private LocalDate date;
     private String threeDaysTime;
 }

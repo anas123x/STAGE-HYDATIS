@@ -21,7 +21,7 @@ import org.joda.time.LocalDate;
 @Builder // Provides a builder pattern for object construction
 public class CreateOrUpdatePersonCheckingCommand extends BaseCommand {
     private String id; // Unique identifier for the command
-    private Long personId; // ID of the person associated with the checking
+    private String personId; // ID of the person associated with the checking
     private String checkingId;
     private LocalDate date; // Date of the checking event
     private String threeDaysTime; // Custom field, possibly indicating a time span or specific timing

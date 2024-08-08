@@ -15,6 +15,6 @@ import org.joda.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class GetDayCheckingsQuery extends BaseQuery {
-    private Long personId;
+    private String personId;
     private LocalDate date;
 }

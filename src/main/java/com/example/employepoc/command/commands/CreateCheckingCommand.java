@@ -22,7 +22,7 @@ import java.util.List;
 @ToString // Generates a toString method including all class attributes
 public class CreateCheckingCommand extends BaseCommand {
     private String id; // Unique identifier for the command
-    private Long personId; // ID of the person associated with the checking
+    private String personId; // ID of the person associated with the checking
     private Checking checking; // Primary checking details
     private ArrayList<Checking> others; // Additional checking records related to the person
 }

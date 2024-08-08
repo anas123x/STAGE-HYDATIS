@@ -25,8 +25,8 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
         bearerFormat = "JWT",
 
         scheme = "bearer",
-        flows = @OAuthFlows(clientCredentials = @OAuthFlow(authorizationUrl = "http://localhost:8080/auth/",
-                tokenUrl = "http://localhost:8080/realms/timestamp-realm/protocol/openid-connect/token"
+        flows = @OAuthFlows(clientCredentials = @OAuthFlow(authorizationUrl = "http://localhost:8888/auth/",
+                tokenUrl = "http://localhost:8888/realms/timestamp-realm/protocol/openid-connect/token"
         )))
 @EnableWebSecurity
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
@@ -52,9 +52,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.csrf().disable().cors().disable()
+        http.csrf().disable().cors().and()
                 .authorizeRequests()
-                .antMatchers("/checking/create").hasRole("user")
+                .antMatchers("/checking/**/**").permitAll()
+           /*     .antMatchers("/checking/user/**").hasRole("user")
+                .antMatchers("/checking/admin/**").hasRole("admin")*/
                 .antMatchers("/ws-endpoint/**").permitAll()
                 .antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest()

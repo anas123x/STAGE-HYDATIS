@@ -14,6 +14,6 @@ import org.joda.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class GetCollectiveCheckingsQuery extends BaseQuery {
-    private Long personId;
+    private String personId;
     private LocalDate date;
 }

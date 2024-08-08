@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 public class CreatePersonsCheckingWithCollectiveRequest {
-    private List<Long> personIds;
+    private List<String> personIds;
     private LocalDate date;
     private String threeDaysTime;
     private boolean collective;

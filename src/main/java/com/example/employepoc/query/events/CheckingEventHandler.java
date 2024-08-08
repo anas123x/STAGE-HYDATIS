@@ -53,6 +53,7 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
         checkingEntity.setTimesheetId(1001L);
         try {
             Person p = personQueryRepository.findById(event.getPersonId()).get();
+            System.out.println(p);
             checkingEntity.setPerson(p);
             checkingEntity.setMatricule(p.getMatricule());
             if(!(p.getUser()==null)){
@@ -157,7 +158,7 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
 
         // Implementation goes here
         for (int i = 0; i < event.getPersonIds().size(); i++) {
-            Long personId = event.getPersonIds().get(i);
+            String personId = event.getPersonIds().get(i);
             try {
                 // Fetch the person from the database
                 Person person = personQueryRepository.findById(personId)
@@ -201,7 +202,7 @@ public class CheckingEventHandler implements CheckingEvenHandlerInterface {
     @Override
     public void on(PersonsCheckingCreatedEvent event) {
         for (int i = 0; i < event.getPersonIds().size(); i++) {
-            Long personId = event.getPersonIds().get(i);
+            String personId = event.getPersonIds().get(i);
             try {
                 // Fetch the person from the database
                 Person person = personQueryRepository.findById(personId)

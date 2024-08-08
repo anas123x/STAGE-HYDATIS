@@ -1,12 +1,12 @@
 server:
-  port: 8081
+  port: 8082
 
 keycloak:
-  auth-server-url: http://localhost:8080
+  auth-server-url: http://localhost:8888
   realm: timestamp-realm
   resource: timestamp-client
   credentials:
-    secret: jo4V8zDiNCvf6Tad5Ckyv2qp0Drm1MDs
+    secret: "**********"
   use-resource-role-mappings: true
   bearer-only: true
   ssl-required: NONE
@@ -16,7 +16,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/timestamp-realm
+          issuer-uri: http://localhost:8888/realms/timestamp-realm
 
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres

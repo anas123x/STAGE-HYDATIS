@@ -78,6 +78,8 @@ public class EmployePocApplication {
         queryDispatcher.registerHandler(GetUserCheckingsByDatesAndPersonsMapQuery.class, checkingQueryHandler::handle);
         queryDispatcher.registerHandler(GetUserCheckingsByPersonsAndDatesMapQuery.class, checkingQueryHandler::handle);
         queryDispatcher.registerHandler(GetUserCheckingsQuery.class, checkingQueryHandler::handle);
+        queryDispatcher.registerHandler(GetAllCheckingsQuery.class, checkingQueryHandler::handle);
+
     }
 
     /**

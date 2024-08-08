@@ -21,6 +21,6 @@ import java.util.Collection;
 @Getter
 @AllArgsConstructor
 public class GetUserCheckingsByPersonsAndDatesMapQuery extends BaseQuery {
-    private List<Long> personsIds;
+    private List<String> personsIds;
     private Collection<LocalDate> dates;
 }

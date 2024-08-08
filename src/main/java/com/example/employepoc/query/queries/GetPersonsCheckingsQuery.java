@@ -28,7 +28,7 @@ import java.util.Collection;
 @Getter
 @AllArgsConstructor
 public class GetPersonsCheckingsQuery extends BaseQuery {
-    private List<Long> personsId;
+    private List<String> personsId;
     private LocalDateTime from;
     private LocalDateTime to;
 }

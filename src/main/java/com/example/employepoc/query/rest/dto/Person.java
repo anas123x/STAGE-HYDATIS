@@ -18,13 +18,13 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-@Document(collection = "person")
+@Document(collection = "Person")
 @Builder
 public class Person extends BaseBean {
 	private static final long serialVersionUID = 3L;
 
 	@Id
-	private Long id;
+	private String id;
 	private String firstName;
 	private String secondName;
 	private String lastName;

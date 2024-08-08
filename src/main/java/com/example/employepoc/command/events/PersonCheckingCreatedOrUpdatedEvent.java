@@ -24,7 +24,7 @@ public class PersonCheckingCreatedOrUpdatedEvent extends BaseEvent {
     private String identifier;
 
     //private Long id;
-    private Long personId;
+    private String personId;
     private String checkingId;
     private LocalDate date;
     private String threeDaysTime;

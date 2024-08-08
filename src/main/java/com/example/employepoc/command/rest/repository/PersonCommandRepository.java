@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * This interface is used to perform CRUD operations on {@link Person} entities.
  */
 @Repository
-public interface PersonCommandRepository extends JpaRepository<Person, Long> {
+public interface PersonCommandRepository extends JpaRepository<Person, String> {
 }

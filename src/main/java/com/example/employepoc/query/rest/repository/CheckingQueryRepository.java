@@ -25,5 +25,5 @@ public interface CheckingQueryRepository extends MongoRepository<Checking, Strin
      * @return A list of {@link Checking} records matching the specified criteria.
      */
     @Query("{ 'person.id' : ?0, 'actualTime' : ?1, 'direction' : ?2, 'actualSource' : ?3 }")
-    List<Checking> findByPersonIdAndActualTimeAndDirectionAndActualSource(Long id, LocalDateTime actualTime, Checking.CheckingDirection direction, Checking.CheckingSource actualSource);
+    List<Checking> findByPersonIdAndActualTimeAndDirectionAndActualSource(String id, LocalDateTime actualTime, Checking.CheckingDirection direction, Checking.CheckingSource actualSource);
 }

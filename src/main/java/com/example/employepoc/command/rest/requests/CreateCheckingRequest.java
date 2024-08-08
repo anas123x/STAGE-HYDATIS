@@ -13,6 +13,6 @@ import java.util.List;
 @Data
 public class CreateCheckingRequest {
     private Checking checking; // The primary checking record to be created
-    private Long personId; // The ID of the person associated with the checking
+    private String personId; // The ID of the person associated with the checking
     private ArrayList<Checking> others; // Additional checking records related to the primary checking
 }

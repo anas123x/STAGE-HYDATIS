@@ -23,7 +23,7 @@ public interface ICheckingQueryService {
      * @param to The end of the time range.
      * @return A collection of {@link Checking} instances within the specified time range for the given person.
      */
-    Collection<Checking> getPersonCheckings(Long personId, LocalDateTime from, LocalDateTime to);
+    Collection<Checking> getPersonCheckings(String personId, LocalDateTime from, LocalDateTime to);
 
     /**
      * Retrieves checkings for multiple persons within a specified time range, organized by person ID.
@@ -33,7 +33,7 @@ public interface ICheckingQueryService {
      * @param to The end of the time range.
      * @return A map with person IDs as keys and lists of {@link Checking} instances as values.
      */
-    Map<Long, List<Checking>> getPersonsCheckings(List<Long> personsId, LocalDateTime from, LocalDateTime to);
+    Map<Long, List<Checking>> getPersonsCheckings(List<String> personsId, LocalDateTime from, LocalDateTime to);
 
     /**
      * Retrieves checkings for multiple persons across specific dates, organized by date and person ID.
@@ -42,7 +42,7 @@ public interface ICheckingQueryService {
      * @param dates A collection of dates.
      * @return A map with dates as keys and another map as values, which contains person IDs and their respective lists of {@link Checking} instances.
      */
-    Map<LocalDate, Map<Long, List<Checking>>> getUserCheckingsByDatesAndPersonsMap(Map<Long, Person> persons,
+    Map<LocalDate, Map<Long, List<Checking>>> getUserCheckingsByDatesAndPersonsMap(Map<String, Person> persons,
                                                                                    Collection<LocalDate> dates);
 
     /**
@@ -52,7 +52,7 @@ public interface ICheckingQueryService {
      * @param dates A collection of dates.
      * @return A map with person IDs as keys and another map as values, which contains dates and their respective lists of {@link Checking} instances.
      */
-    Map<Long, Map<LocalDate, List<Checking>>> getUserCheckingsByPersonsAndDatesMap(Map<Long, Person> persons,
+    Map<Long, Map<LocalDate, List<Checking>>> getUserCheckingsByPersonsAndDatesMap(Map<String, Person> persons,
                                                                                    Collection<LocalDate> dates);
 
     /**
@@ -62,7 +62,7 @@ public interface ICheckingQueryService {
      * @param date The specific date.
      * @return A list of {@link Checking} instances for the given person on the specified date.
      */
-    List<Checking> getUserCheckings(Long personId, LocalDate date);
+    List<Checking> getUserCheckings(String personId, LocalDate date);
 
     /**
      * Retrieves collective checkings for a given person on a specific date.
@@ -72,7 +72,7 @@ public interface ICheckingQueryService {
      * @param date The specific date.
      * @return A list of {@link Checking} instances representing collective checkings for the given person on the specified date.
      */
-    List<Checking> getCollectiveCheckings(Long personId, LocalDate date);
+    List<Checking> getCollectiveCheckings(String personId, LocalDate date);
 
     /**
      * Retrieves day checkings for a given person on a specific date.
@@ -82,5 +82,13 @@ public interface ICheckingQueryService {
      * @param date The specific date.
      * @return A list of {@link Checking} instances for the given person on the specified date, possibly filtered to include only day-time checkings.
      */
-    List<Checking> getDayCheckings(Long personId, LocalDate date);
+    List<Checking> getDayCheckings(String personId, LocalDate date);
+
+
+    /**
+     *  Retrieves all checkings.
+     *
+     * @return A collection of {@link Checking} instances all persons at all times.
+     */
+    List<Checking> getAllChekings();
 }

@@ -1,59 +1,56 @@
 version: '3'
 services:
-  kafka:
-    image: confluentinc/cp-kafka:latest # The Docker image for Kafka
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # Connection string for Zookeeper
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # Kafka's advertised listeners
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Replication factor for the offsets topic
-    depends_on:
-      - zookeeper # Depends on the Zookeeper service
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest # The Docker image for Zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181 # Client port for Zookeeper
-
-  postgres:
-    image: postgres:latest # The Docker image for PostgreSQL
-    environment:
-      POSTGRES_USER: postgres # Default user for PostgreSQL
-      POSTGRES_PASSWORD: admin # Password for the default user
-      POSTGRES_DB: postgres # Default database name
-      POSTGRES_HOST_AUTH_METHOD: trust # Authentication method for the host
+  app:
+    build:
+      context: ./ # Context for building the application's Docker image
+      dockerfile: dockerfile # Name of the Dockerfile
     ports:
-      - "5432:5432" # Expose PostgreSQL on port 5432
+      - "8082:8082" # Expose the application on port 8080
 
-  mongo:
-    image: mongo:latest # The Docker image for MongoDB
-    ports:
-      - "27017:27017" # Expose MongoDB on port 27017
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:20.0.0
-    environment:
-      KC_DB: postgres
-      KC_DB_URL_HOST: postgres # Use service name defined in this file
-      KC_DB_URL_DATABASE: postgres # Example value for Keycloak database name
-      KC_DB_USERNAME: postgres # Example value for Keycloak database user
-      KC_DB_SCHEMA: public
-      KC_DB_PASSWORD:
-      KEYCLOAK_ADMIN: admin # Example value for Keycloak admin username
-      KEYCLOAK_ADMIN_PASSWORD: admin # Example value for Keycloak admin password
-    command:
-      - "start-dev --http-port=8080"
-    ports:
-      - 8080:8080
-    depends_on:
-      - postgres
-
-#  app:
-#    build:
-#      context: ./ # Context for building the application's Docker image
-#      dockerfile: dockerfile # Name of the Dockerfile
-#    ports:
-#      - "8080:8080" # Expose the application on port 8080
+#  kafka:
+#    image: confluentinc/cp-kafka:latest # The Docker image for Kafka
+#    environment:
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # Connection string for Zookeeper
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # Kafka's advertised listeners
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Replication factor for the offsets topic
 #    depends_on:
-#      - kafka
+#      - zookeeper # Depends on the Zookeeper service
+#
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:latest # The Docker image for Zookeeper
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181 # Client port for Zookeeper
+#
+#  postgres:
+#    image: postgres:latest # The Docker image for PostgreSQL
+#    environment:
+#      POSTGRES_USER: postgres # Default user for PostgreSQL
+#      POSTGRES_PASSWORD: admin # Password for the default user
+#      POSTGRES_DB: postgres # Default database name
+#      POSTGRES_HOST_AUTH_METHOD: trust # Authentication method for the host
+#    ports:
+#      - "5432:5432" # Expose PostgreSQL on port 5432
+#
+#  mongo:
+#    image: mongo:latest # The Docker image for MongoDB
+#    ports:
+#      - "27017:27017" # Expose MongoDB on port 27017
+#
+#  keycloak:
+#    image: quay.io/keycloak/keycloak:20.0.0
+#    environment:
+#      KC_DB: postgres
+#      KC_DB_URL_HOST: postgres # Use service name defined in this file
+#      KC_DB_URL_DATABASE: postgres # Example value for Keycloak database name
+#      KC_DB_USERNAME: postgres # Example value for Keycloak database user
+#      KC_DB_SCHEMA: public
+#      KC_DB_PASSWORD:
+#      KEYCLOAK_ADMIN: admin # Example value for Keycloak admin username
+#      KEYCLOAK_ADMIN_PASSWORD: admin # Example value for Keycloak admin password
+#    command:
+#      - "start-dev --http-port=8080"
+#    ports:
+#      - 8080:8080
+#    depends_on:
 #      - postgres
-#      - mongo # The application depends on Kafka, PostgreSQL, and MongoDB services
+#

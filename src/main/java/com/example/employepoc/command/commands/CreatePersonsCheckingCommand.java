@@ -22,7 +22,7 @@ import java.util.List;
 @Builder // Provides a builder pattern for object construction
 public class CreatePersonsCheckingCommand extends BaseCommand {
     private String id; // Unique identifier for the command
-    private List<Long> personIds; // IDs of the persons associated with the checking
+    private List<String> personIds; // IDs of the persons associated with the checking
     private LocalDate date;
     private String threeDaysTime;
     private List<Checking> checkings; // List of checking records for each person

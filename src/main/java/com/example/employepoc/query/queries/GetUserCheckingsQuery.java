@@ -14,6 +14,6 @@ import org.joda.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class GetUserCheckingsQuery extends BaseQuery {
-    private Long personId; // The ID of the person whose checkings are to be fetched
+    private String personId; // The ID of the person whose checkings are to be fetched
     private LocalDate date; // The specific date for which to fetch the checkings
 }

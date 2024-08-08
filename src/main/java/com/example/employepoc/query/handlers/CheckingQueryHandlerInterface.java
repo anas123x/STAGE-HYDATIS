@@ -28,7 +28,7 @@ public interface CheckingQueryHandlerInterface {
      * @param query The query containing the list of person IDs and the date range for the checkings.
      * @return A map where each key is a person's ID and the value is a list of {@link Checking} instances for that person.
      */
-    Map<Long, List<Checking>> handle(GetPersonsCheckingsQuery query);
+    Map<String, List<Checking>> handle(GetPersonsCheckingsQuery query);
 
     /**
      * Handles a query to retrieve checkings for users by dates and persons map.
@@ -37,7 +37,7 @@ public interface CheckingQueryHandlerInterface {
      * @return A map where each key is a date and the value is another map.
      *         The nested map's key is a person's ID and the value is a list of {@link Checking} instances for that date and person.
      */
-    Map<LocalDate, Map<Long, List<Checking>>> handle(GetUserCheckingsByDatesAndPersonsMapQuery query);
+    Map<LocalDate, Map<String, List<Checking>>> handle(GetUserCheckingsByDatesAndPersonsMapQuery query);
 
     /**
      * Handles a query to retrieve checkings for users by persons and dates map.
@@ -46,7 +46,7 @@ public interface CheckingQueryHandlerInterface {
      * @return A map where each key is a person's ID and the value is another map.
      *         The nested map's key is a date and the value is a list of {@link Checking} instances for that person and date.
      */
-    Map<Long, Map<LocalDate, List<Checking>>> handle(GetUserCheckingsByPersonsAndDatesMapQuery query);
+    Map<String, Map<LocalDate, List<Checking>>> handle(GetUserCheckingsByPersonsAndDatesMapQuery query);
 
     /**
      * Handles a query to retrieve all checkings for a user.
@@ -71,4 +71,13 @@ public interface CheckingQueryHandlerInterface {
      * @return A list of {@link Checking} instances for the specified day.
      */
     List<Checking> handle(GetDayCheckingsQuery query);
+
+
+    /**
+     * Handles a query to retrieve checkings for multiple persons across multiple dates, o
+     *
+     *
+     * @return A list of {@link Checking} instances for all persons and dates.
+     */
+    List<Checking> handle(GetAllCheckingsQuery query);
 }

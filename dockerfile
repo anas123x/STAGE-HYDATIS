@@ -2,6 +2,9 @@
 # This is based on Debian and sets the MAVEN_HOME environment variable to /usr/share/maven
 FROM maven:3.8.2-openjdk-8-slim AS build
 
+# Copy the settings.xml file
+COPY settings.xml /usr/share/maven/ref/
+
 # Copy the pom.xml file to download dependencies
 COPY pom.xml /usr/src/app/
 WORKDIR /usr/src/app/
